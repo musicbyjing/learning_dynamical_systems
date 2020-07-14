@@ -28,6 +28,7 @@ est_type         = est_options.type;
 do_plots         = est_options.do_plots;
 [M,N]            = size(Xi_ref);
 
+%%%%%% useful for now %%%%%%
 if est_type == 1
     max_gaussians    = est_options.maxK;
     if isempty(est_options.fixed_K)
@@ -213,6 +214,8 @@ switch est_type
         else
             k = fixed_K;
         end
+        disp("K is: "); 
+        disp(k);
         % Train GMM with Optimal k
         warning('off', 'all'); % there are a lot of really annoying warnings when fitting GMMs
         %fit a GMM to our data

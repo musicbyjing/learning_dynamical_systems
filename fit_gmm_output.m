@@ -215,17 +215,26 @@ switch est_type
         else
             k = fixed_K;
         end
+        disp("K is: "); 
+        disp(k);
         % Train GMM with Optimal k
         warning('off', 'all'); % there are a lot of really annoying warnings when fitting GMMs
         %fit a GMM to our data
         load("saved_params.mat", "Mu", "Sigma");
-        S.mu = Mu;
-        S.sigma = Sigma;
-        disp("Parameters loaded");
-        disp(Mu);
-        disp(Sigma);
         
-        GMM_full = fitgmdist([Xi_ref]', k, 'Start', S, 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 10); 
+        
+        S = struct('mu', transpose(Mu), 'Sigma', Sigma);
+        
+%         S.mu = transpose(Mu);
+%         S.sigma = Sigma;
+        disp("Parameters loaded");
+        disp(S.mu);
+        disp(S.Sigma);
+        disp(S);
+        
+        
+%         GMM_full = fitgmdist([Xi_ref]', k, 'Start', S, 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 10); 
+        GMM_full = fitgmdist(transpose(Xi_ref), k, 'Start', S, 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 1);
         warning('on', 'all');
         
         % Extract Model Parameters

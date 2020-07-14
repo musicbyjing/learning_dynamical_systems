@@ -100,7 +100,7 @@ est_options.type             = 1;   % GMM Estimation Alorithm Type
 
 % If algo 1 selected:
 est_options.maxK             = 10;  % Maximum Gaussians for Type 1
-est_options.fixed_K          = [];  % Fix K and estimate with EM for Type 1
+est_options.fixed_K          = [];  % Fix K and estimate with EM for Type 1; ORIGINALLY []
 
 % If algo 0 or 2 selected:
 est_options.samplerIter      = 50;  % Maximum Sampler Iterations
@@ -136,7 +136,6 @@ end
 %% Generate GMM data structure for DS learning
 clear ds_gmm; 
 ds_gmm.Mu = Mu; ds_gmm.Sigma = Sigma; ds_gmm.Priors = Priors;
-% ds_gmm.Mu = load("mu.mat"); ds_gmm.Sigma = load("sigma.mat"); ds_gmm.Priors = load("priors.mat")
 
 %% (Recommended!) Step 2.1: Dilate the Covariance matrices that are too thin
 % This is recommended to get smoother streamlines/global dynamics
@@ -158,7 +157,9 @@ end
 
 % Visualize Estimated Parameters
 [h_gmm]  = visualizeEstimatedGMM(Xi_ref,  ds_gmm.Priors, ds_gmm.Mu, ds_gmm.Sigma, est_labels, est_options);
-return;
+
+% return;
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%  Step 3 (DS ESTIMATION): ESTIMATE SYSTEM DYNAMICS MATRICES  %%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,6 +214,7 @@ end
 axis fit;
 %% %%%%%%%%%%%%   Export DS parameters to Mat/Txt/Yaml files  %%%%%%%%%%%%%%%%%%%
 DS_name = '2d-U-Nav';
+pkg_dir         = './';
 save_lpvDS_to_Mat(DS_name, pkg_dir, ds_gmm, A_k, b_k, att, x0_all, dt, P_est, constr_type, est_options)
 
 %% Save LPV-DS parameters to text files
