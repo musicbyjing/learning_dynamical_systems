@@ -226,7 +226,7 @@ switch est_type
         Priors = GMM_full.ComponentProportion;
         Mu = transpose(GMM_full.mu);
         Sigma = GMM_full.Sigma;
-        disp("Parameters saved");
+        fprintf("Parameters saved \n");
 %         disp(Mu);
 %         disp(Sigma);
 %         disp('Priors are: ')

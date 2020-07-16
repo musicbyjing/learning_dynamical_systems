@@ -45,7 +45,7 @@ addpath(genpath(pwd));
 pkg_dir         = './';
 chosen_dataset  = 1; 
 sub_sample      = 1; % '>2' for real 3D Datasets, '1' for 2D toy datasets % originally 5
-nb_trajectories = 3; % For real 3D data only
+nb_trajectories = 0; % For real 3D data only % originally 3
 [Data, Data_sh, att, x0_all, data, dt] = load_dataset_DS(pkg_dir, chosen_dataset, sub_sample, nb_trajectories);
 
 % Position/Velocity Trajectories
@@ -59,34 +59,34 @@ Xi_dot_ref = Data(M+1:end,:);
 
 %% %%%%%%%%%%%% [Optional] Load pre-learned lpv-DS model from Mat file  %%%%%%%%%%%%%%%%%%%
 % DS_name = '/3D-Sink/3D-Sink_pqlf_2';
-DS_name = '3D-Via-point_pqlf_2';
-matfile = strcat(pkg_dir,'/models/', DS_name,'.mat');
-load(matfile)
-if constr_type == 1
-    ds_lpv = @(x) lpv_ds(x-repmat(att,[1 size(x,2)]), ds_gmm, A_g, b_g);
-else
-    ds_lpv = @(x) lpv_ds(x, ds_gmm, A_k, b_k);
-end
+% DS_name = '3D-Via-point_pqlf_2';
+% matfile = strcat(pkg_dir,'/models/', DS_name,'.mat');
+% load(matfile)
+% if constr_type == 1
+%     ds_lpv = @(x) lpv_ds(x-repmat(att,[1 size(x,2)]), ds_gmm, A_g, b_g);
+% else
+%     ds_lpv = @(x) lpv_ds(x, ds_gmm, A_k, b_k);
+% end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Step 1 - OPTION 2 (DATA LOADING): Load Motions from LASA Handwriting Dataset %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Choose DS LASA Dataset to load
-% clear all; close all; clc
-% 
-% % Select one of the motions from the LASA Handwriting Dataset
-% sub_sample      = 5; % Each trajectory has 1000 samples when set to '1'
-% nb_trajectories = 7; % Maximum 7, will select randomly if <7
-% [Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS(sub_sample, nb_trajectories);
-% 
-% % Position/Velocity Trajectories
-% vel_samples = 15; vel_size = 0.5; 
-% [h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
-% 
-% % Extract Position and Velocities
-% M          = size(Data,1)/2;    
-% Xi_ref     = Data(1:M,:);
-% Xi_dot_ref = Data(M+1:end,:);  
+% Choose DS LASA Dataset to load
+clear all; close all; clc
+
+% Select one of the motions from the LASA Handwriting Dataset
+sub_sample      = 5; % Each trajectory has 1000 samples when set to '1'
+nb_trajectories = 7; % Maximum 7, will select randomly if <7
+[Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS(sub_sample, nb_trajectories);
+
+% Position/Velocity Trajectories
+vel_samples = 15; vel_size = 0.5; 
+[h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
+
+% Extract Position and Velocities
+M          = size(Data,1)/2;    
+Xi_ref     = Data(1:M,:);
+Xi_dot_ref = Data(M+1:end,:);  
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Step 2 (GMM FITTING): Fit GMM to Trajectory Data %%
@@ -153,12 +153,44 @@ end
 
 %%  Visualize Gaussian Components and labels on clustered trajectories 
 % Extract Cluster Labels
-[~, est_labels] =  my_gmm_cluster(Xi_ref, ds_gmm.Priors, ds_gmm.Mu, ds_gmm.Sigma, 'hard', []);
+[~, est_labels] =  my_gmm_cluster(Xi_ref, ds_gmm.Priors, ds_gmm.Mu, ds_gmm.Sigma, 'hard', []); % ~ means disregard that variable (i.e. the first var)
+
+% est_labels gives the 7cluster number for each data point; it's a n x 1
+% vector
+%
+% count the number of data points in each cluster, then find the one with
+% the most points
+cluster_counts = [sum(est_labels(:) == 1), sum(est_labels(:) == 2), sum(est_labels(:) == 3), sum(est_labels(:) == 4)];
+[~, biggest_cluster] = max(cluster_counts); % returns INDEX of max element in cluster_counts
+max_count = cluster_counts(biggest_cluster); % get the number of elements in the biggest cluster
+
+fprintf("Biggest cluster is %d with %d elements \n", biggest_cluster, max_count)
+
+% get the indices of the data points in biggest_cluster
+% indices = zeros(1, sum(est_labels(:) == biggest_cluster));
+
+indices = [];
+for j = 1:numel(est_labels)
+    if est_labels(j) == biggest_cluster
+        indices = [indices j];
+    end
+end
+
+% extract the data points belonging to biggest_cluster
+selected_data = zeros(1, size(indices, 2));
+for j = 1:numel(indices)
+    selected_data(j) = Xi_ref(j);
+end
+
+disp(size(selected_data))
+disp(selected_data)
+
+
 
 % Visualize Estimated Parameters
 [h_gmm]  = visualizeEstimatedGMM(Xi_ref,  ds_gmm.Priors, ds_gmm.Mu, ds_gmm.Sigma, est_labels, est_options);
 
-% return;
+return;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%  Step 3 (DS ESTIMATION): ESTIMATE SYSTEM DYNAMICS MATRICES  %%%%%%%%%

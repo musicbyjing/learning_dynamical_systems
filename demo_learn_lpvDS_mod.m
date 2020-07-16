@@ -161,16 +161,32 @@ end
 % count the number of data points in each cluster, then find the one with
 % the most points
 cluster_counts = [sum(est_labels(:) == 1), sum(est_labels(:) == 2), sum(est_labels(:) == 3), sum(est_labels(:) == 4)];
-[~, biggest_cluster] = max(cluster_counts);
+[~, biggest_cluster] = max(cluster_counts); % returns INDEX of max element in cluster_counts
+max_count = cluster_counts(biggest_cluster); % get the number of elements in the biggest cluster
 
-disp("Biggest cluster is: ")
-disp(biggest_cluster)
+fprintf("Biggest cluster is %d with %d elements \n", biggest_cluster, max_count)
 
-% then extract the data points belonging to the biggest cluster
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FILL IN HERE
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% get the indices of the data points in biggest_cluster
+% indices = zeros(1, sum(est_labels(:) == biggest_cluster));
+
+k = 1;
+indices = zeros(1, max_count);
+for j = 1:numel(est_labels)
+    if est_labels(j) == biggest_cluster
+        indices(k) = j;
+        k = k+1;
+    end
+end
+
+% extract the data points belonging to biggest_cluster
+selected_data = zeros(2, max_count);
+for j = 1:numel(indices)
+    selected_data(:,j) = Xi_ref(j);
+end
+
+disp(size(selected_data))
+disp(selected_data)
+
 
 % Visualize Estimated Parameters
 [h_gmm]  = visualizeEstimatedGMM(Xi_ref,  ds_gmm.Priors, ds_gmm.Mu, ds_gmm.Sigma, est_labels, est_options);
