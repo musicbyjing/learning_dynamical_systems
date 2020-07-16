@@ -222,15 +222,14 @@ switch est_type
         %fit a GMM to our data
         load("saved_params.mat", "Mu", "Sigma");
         
-        
         S = struct('mu', transpose(Mu), 'Sigma', Sigma);
         
 %         S.mu = transpose(Mu);
 %         S.sigma = Sigma;
         disp("Parameters loaded");
-        disp(S.mu);
-        disp(S.Sigma);
-        disp(S);
+%         disp(S.mu);
+%         disp(S.Sigma);
+%         disp(S);
         
         
 %         GMM_full = fitgmdist([Xi_ref]', k, 'Start', S, 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 10); 

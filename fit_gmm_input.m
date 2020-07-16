@@ -214,8 +214,8 @@ switch est_type
         else
             k = fixed_K;
         end
-        disp("K is: "); 
-        disp(k);
+%         disp("K is: "); 
+%         disp(k);
         % Train GMM with Optimal k
         warning('off', 'all'); % there are a lot of really annoying warnings when fitting GMMs
         %fit a GMM to our data
@@ -227,8 +227,12 @@ switch est_type
         Mu = transpose(GMM_full.mu);
         Sigma = GMM_full.Sigma;
         disp("Parameters saved");
-        disp(Mu);
-        disp(Sigma);
+%         disp(Mu);
+%         disp(Sigma);
+%         disp('Priors are: ')
+%         disp(Priors);
+%         disp('Xi_ref is: ')
+%         disp(Xi_ref)
         save("saved_params.mat", "Mu", "Sigma");
         
 
