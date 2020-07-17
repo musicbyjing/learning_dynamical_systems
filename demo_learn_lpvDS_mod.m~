@@ -122,16 +122,31 @@ est_options.length_scale     = [];  % if estimate_l=0 you can define your own
                                     % directionality is taken into account
 
 % Fit GMM to Trajectory Data
-user_input = input("\nType 0 for input, 1 for output: ");
-fprintf('\n\n')
+user_input = input("\nType 0 to use all data, 1 to select an area: ");
 if user_input < 0 || user_input > 1
-    disp('Wrong number!')
-    disp('Please type a number between 0 and 1.')
+    fprintf("Wrong number! Please type a number between 0 and 1.")
+elseif user_input == 1
+    fprintf("\nInput the area you want to select data from, one coordinate at a time, as follows: x_0, x_1, y_0, y_1 where x_0 < x_1 and y_0 < y_1");
+    arr = zeros(1,4);
+    for j = 1:4
+        arr(j) = input("\nType a coordinate: ");
+    end
+    for j = 1:numel(Xi_ref)/2
+        if Xi_ref(j,1) > x_0 && Xi_ref(j,1) < x_1 && Xi_ref(2,j) > y_0 && 
+end
+
+
+user_input = input("\nType 0 for input, 1 for output: ");
+if user_input < 0 || user_input > 1
+    fprintf("Wrong number! Please type a number between 0 and 1.")
 elseif user_input == 0
     [Priors, Mu, Sigma] = fit_gmm_input(Xi_ref, Xi_dot_ref, est_options);
 elseif user_input == 1
     [Priors, Mu, Sigma] = fit_gmm_output(Xi_ref, Xi_dot_ref, est_options);
 end
+
+
+
 
 %% Generate GMM data structure for DS learning
 clear ds_gmm; 
@@ -155,7 +170,7 @@ end
 % Extract Cluster Labels
 [~, est_labels] =  my_gmm_cluster(Xi_ref, ds_gmm.Priors, ds_gmm.Mu, ds_gmm.Sigma, 'hard', []); % ~ means disregard that variable (i.e. the first var)
 
-% est_labels gives the 7cluster number for each data point; it's a n x 1
+% est_labels gives the cluster number for each data point; it's a n x 1
 % vector
 %
 % count the number of data points in each cluster, then find the one with
@@ -169,21 +184,21 @@ fprintf("Biggest cluster is %d with %d elements \n", biggest_cluster, max_count)
 % get the indices of the data points in biggest_cluster
 % indices = zeros(1, sum(est_labels(:) == biggest_cluster));
 
-indices = [];
+k = 1;
+indices = zeros(1, max_count);
 for j = 1:numel(est_labels)
     if est_labels(j) == biggest_cluster
-        indices = [indices j];
+        indices(k) = j;
+        k = k+1;
     end
 end
 
 % extract the data points belonging to biggest_cluster
-selected_data = zeros(1, size(indices, 2));
+selected_data = zeros(2, max_count);
 for j = 1:numel(indices)
-    selected_data(j) = Xi_ref(j);
+    selected_data(:,j) = Xi_ref(j);
 end
 
-disp(size(selected_data))
-disp(selected_data)
 
 
 
