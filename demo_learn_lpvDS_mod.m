@@ -121,17 +121,22 @@ est_options.length_scale     = [];  % if estimate_l=0 you can define your own
                                     % l, when setting l=0 only
                                     % directionality is taken into account
 
-% Fit GMM to Trajectory Data
-user_input = input("\nType 0 to use all data, 1 to select an area: ");
+%% Fit GMM to Trajectory Data
+
+% Decide if using all data or just part of it
+fprintf('The original dataset size is  %d x %d.', size(Xi_ref));
+user_input = input("\n\nType 0 to use all data, 1 to select an area: ");
 if user_input < 0 || user_input > 1
     fprintf("Wrong number! Please type a number between 0 and 1.")
 elseif user_input == 1
+% ------- User input version -------
 %     fprintf("\nInput the area you want to select data from, one coordinate at a time, in the following order: \n x_min, x_max, y_min, y_max");
 %     bounds = zeros(1,4);
 %     for j = 1:4
 %         bounds(j) = input("\nType a coordinate: ");
 %     end
-    bounds = [19, 30, -20, 21]; % Hardcoded values derived from looking at the biggest cluster in LASA datasets 7 and 8
+% ------- Hardcoded version -------
+    bounds = [19, 30, -20, 21]; % values derived from looking at the biggest cluster in LASA datasets 7 and 8
     selected_data = [];
     selected_data_dot = [];
     for j = 1:numel(Xi_ref)/2
@@ -142,9 +147,24 @@ elseif user_input == 1
     end
     Xi_ref = selected_data;
     Xi_dot_ref = selected_data_dot;
+    fprintf('The dataset size after selecting an area is %d x %d.', size(Xi_ref));
 end
 
-user_input = input("\nType 0 for input, 1 for output: ");
+% Randomly delete some of the data
+user_input = input("\n\nWhat proportion (0-1) of the data should be randomly deleted? ");
+if user_input < 0 || user_input > 1
+    fprintf("Please type a decimal between 0 and 1.")
+else
+    dataset_size = size(Xi_ref, 2);
+    num_to_remove = int16(user_input * dataset_size);
+    permutation = randperm(dataset_size);
+    Xi_ref(:, permutation(1:num_to_remove)) = [];
+    Xi_dot_ref(:, permutation(1:num_to_remove)) = [];
+    fprintf('The dataset size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
+end
+
+% Decide if fitting from scratch or using previously saved parameters
+user_input = input("\n\nType 0 for input, 1 for output: ");
 if user_input < 0 || user_input > 1
     fprintf("Wrong number! Please type a number between 0 and 1.")
 elseif user_input == 0
@@ -207,7 +227,7 @@ if constr_type == 1
     [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Data_sh, zeros(M,1), constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x-repmat(att,[1 size(x,2)]), ds_gmm, A_k, b_k);
 else
-    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Data, att, constr_type, ds_gmm, P_opt, init_cvx);
+    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, att, constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x, ds_gmm, A_k, b_k);
 end
 
