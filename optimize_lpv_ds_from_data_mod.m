@@ -168,12 +168,12 @@ comp_time = typecast(sol.solvertime, 'double');
 file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
 if isfile(file)
     load(file, 'obj');
-    temp = [error; comp_time];
+    temp = [N; error; comp_time];
     obj = [obj temp];
     save(file, 'obj');
     fprintf('Dataset size, error, and computation time appended to graph_data.mat.\n')
 else
-    obj = [error; comp_time];
+    obj = [N; error; comp_time];
     save(file, 'obj');
     fprintf('graph_data.mat created. Dataset size, error, and computation time saved.\n')
 end
