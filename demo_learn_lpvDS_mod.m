@@ -128,6 +128,7 @@ fprintf('The original dataset size is  %d x %d.', size(Xi_ref));
 user_input = input("\n\nType 0 to use all data, 1 to select an area: ");
 if user_input < 0 || user_input > 1
     fprintf("Wrong number! Please type a number between 0 and 1.")
+    return;
 elseif user_input == 1
 % ------- User input version -------
 %     fprintf("\nInput the area you want to select data from, one coordinate at a time, in the following order: \n x_min, x_max, y_min, y_max");
@@ -154,6 +155,7 @@ end
 user_input = input("\n\nWhat proportion (0-1) of the data should be randomly deleted? ");
 if user_input < 0 || user_input > 1
     fprintf("Please type a decimal between 0 and 1.")
+    return;
 else
     dataset_size = size(Xi_ref, 2);
     num_to_remove = int16(user_input * dataset_size);
@@ -167,6 +169,7 @@ end
 user_input = input("\n\nType 0 for input, 1 for output: ");
 if user_input < 0 || user_input > 1
     fprintf("Wrong number! Please type a number between 0 and 1.")
+    return;
 elseif user_input == 0
     [Priors, Mu, Sigma] = fit_gmm_input(Xi_ref, Xi_dot_ref, est_options);
 elseif user_input == 1

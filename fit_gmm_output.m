@@ -225,7 +225,7 @@ switch est_type
         
 %         S.mu = transpose(Mu);
 %         S.sigma = Sigma;
-        disp("mu and Sigma loaded");
+        disp("mu and Sigma loaded from saved_params.mat");
 %         disp(S.mu);
 %         disp(S.Sigma);
 %         disp(S);
