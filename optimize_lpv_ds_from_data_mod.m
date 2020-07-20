@@ -1,4 +1,4 @@
-function [A_c, b_c, P] = optimize_lpv_ds_from_data_mod(Data, attractor, ctr_type, gmm, varargin)
+function [A_c, b_c, P] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, attractor, ctr_type, gmm, varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) 2018 Learning Algorithms and Systems Laboratory,          %
 % EPFL, Switzerland                                                       %
@@ -21,13 +21,15 @@ function [A_c, b_c, P] = optimize_lpv_ds_from_data_mod(Data, attractor, ctr_type
 % "A Physically-Consistent Bayesian Non-Parametric Mixture Model for      %
 %   Dynamical System Learning."; N. Figueroa and A. Billard; CoRL 2018    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Dimensionality
-[M, N] = size(Data);
-M = M/2;
+% % Dimensionality
+% [M, N] = size(Data);
+% M = M/2;
+% 
+% % Positions and Velocity Trajectories
+% Xi_ref = Data(1:M,:);
+% Xi_dot_ref = Data(M+1:end,:);
 
-% Positions and Velocity Trajectories
-Xi_ref = Data(1:M,:);
-Xi_ref_dot = Data(M+1:end,:);
+[M, N] = size(Xi_ref);
 
 % Define Optimization Variables
 sdp_options = []; Constraints = [];
@@ -123,7 +125,7 @@ Xi_d_dot = reshape(sum(Xi_d_dot_c_raw,3),[M N]);
 
 % Then calculate the difference between approximated velocities
 % and the demonstated ones for A
-Xi_dot_error = Xi_d_dot - Xi_ref_dot;
+Xi_dot_error = Xi_d_dot - Xi_dot_ref;
 
 % Defining Objective Function depending on constraints
 if ctr_type == 0
