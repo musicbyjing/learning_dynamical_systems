@@ -126,7 +126,7 @@ user_input = input("\nType 0 to use all data, 1 to select an area: ");
 if user_input < 0 || user_input > 1
     fprintf("Wrong number! Please type a number between 0 and 1.")
 elseif user_input == 1
-%     fprintf("\nInput the area you want to select data from, one coordinate at a time, in the following order: \n x_0, x_1, y_0, y_1 where x_0 < x_1 and y_0 < y_1");
+%     fprintf("\nInput the area you want to select data from, one coordinate at a time, in the following order: \n x_min, x_max, y_min, y_max");
 %     bounds = zeros(1,4);
 %     for j = 1:4
 %         bounds(j) = input("\nType a coordinate: ");
@@ -204,10 +204,10 @@ end
 
 %%%%%%%%  LPV system sum_{k=1}^{K}\gamma_k(xi)(A_kxi + b_k) %%%%%%%%  
 if constr_type == 1
-    [A_k, b_k, P_est] = optimize_lpv_ds_from_data(Data_sh, zeros(M,1), constr_type, ds_gmm, P_opt, init_cvx);
+    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Data_sh, zeros(M,1), constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x-repmat(att,[1 size(x,2)]), ds_gmm, A_k, b_k);
 else
-    [A_k, b_k, P_est] = optimize_lpv_ds_from_data(Data, att, constr_type, ds_gmm, P_opt, init_cvx);
+    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Data, att, constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x, ds_gmm, A_k, b_k);
 end
 
@@ -258,7 +258,7 @@ fprintf('LPV-DS with (O%d), got prediction RMSE on training set: %d \n', constr_
 % Compute e_dot on training data
 edot = mean(edot_error(ds_lpv, Xi_ref, Xi_dot_ref));
 fprintf('LPV-DS with (O%d), got e_dot on training set: %d \n', constr_type+1, edot);
-
+7
 % Compute DTWD between train trajectories and reproductions
 if ds_plot_options.sim_traj
     nb_traj       = size(x_sim,3);

@@ -226,14 +226,14 @@ switch est_type
         Priors = GMM_full.ComponentProportion;
         Mu = transpose(GMM_full.mu);
         Sigma = GMM_full.Sigma;
-        fprintf("Parameters saved \n");
+        fprintf("mu and Sigma saved \n");
 %         disp(Mu);
 %         disp(Sigma);
 %         disp('Priors are: ')
 %         disp(Priors);
 %         disp('Xi_ref is: ')
 %         disp(Xi_ref)
-        save("saved_params.mat", "Mu", "Sigma");
+        save(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "Mu", "Sigma");
         
 
     case 2

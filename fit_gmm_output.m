@@ -177,7 +177,6 @@ switch est_type
                 Priors(k) = assigned_k/N;               
             end
         end
-        disp("AYYYY");
         
         %% Re-estimate GMM parameters, needed for >2D data
         if M > 2
@@ -220,13 +219,13 @@ switch est_type
         % Train GMM with Optimal k
         warning('off', 'all'); % there are a lot of really annoying warnings when fitting GMMs
         %fit a GMM to our data
-        load("saved_params.mat", "Mu", "Sigma");
+        load(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "Mu", "Sigma");
         
         S = struct('mu', transpose(Mu), 'Sigma', Sigma);
         
 %         S.mu = transpose(Mu);
 %         S.sigma = Sigma;
-        disp("Parameters loaded");
+        disp("mu and Sigma loaded");
 %         disp(S.mu);
 %         disp(S.Sigma);
 %         disp(S);
