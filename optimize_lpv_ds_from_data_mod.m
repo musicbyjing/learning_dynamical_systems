@@ -1,4 +1,4 @@
-function [A_c, b_c, P] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, attractor, ctr_type, gmm, varargin)
+function [A_c, b_c, P] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, attractor, ctr_type, gmm, varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) 2018 Learning Algorithms and Systems Laboratory,          %
 % EPFL, Switzerland                                                       %
@@ -38,8 +38,13 @@ init_cvx = 0;
 
 % Define DS Variables
 K = length(gmm.Priors);
-A_c = zeros(M,M,K);
-b_c = zeros(M,K);
+if store_params == 0
+    A_c = zeros(M,M,K);
+    b_c = zeros(M,K);
+elseif store_params == 1 
+    load(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "A_c", "b_c");
+    fprintf("\n\nA_c and b_c loaded from saved_params.mat \n");
+end
 
 % Define solver for type of constraints
 switch ctr_type
@@ -155,6 +160,12 @@ for k = 1:K
     b_c(:,k)   = value(b_vars{k});
 end
 
+% Save to file A_c and b_c if appropriate
+if store_params == 0
+    save(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "A_c", "b_c", '-append');
+    fprintf("\n\nA_c and b_c saved to saved_params.mat \n");
+end
+
 switch ctr_type 
     case 0 
         P = eye(M);
@@ -167,22 +178,25 @@ sol.info
 check(Constraints)
 fprintf('Total error: %2.2f\nComputation Time: %2.2f\n', value(Objective),sol.solvertime);
 
-error = typecast(value(Objective), 'double');
-comp_time = typecast(sol.solvertime, 'double');
-file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
-if isfile(file)
-    load(file, 'obj');
-    temp = [N; error; comp_time];
-    obj = [obj temp];
-    save(file, 'obj');
-    fprintf('Dataset size, error, and computation time appended to graph_data.mat.\n')
-else
-    obj = [N; error; comp_time];
-    save(file, 'obj');
-    fprintf('graph_data.mat created. Dataset size, error, and computation time saved.\n')
+%% % save to graph_data.mat if learning from prior data
+if store_params == 1 
+    error = typecast(value(Objective), 'double');
+    comp_time = typecast(sol.solvertime, 'double');
+    file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
+    if isfile(file)
+        load(file, 'obj');
+        temp = [N; error; comp_time];
+        obj = [obj temp];
+        save(file, 'obj');
+        fprintf('Dataset size, error, and computation time appended to graph_data.mat.\n')
+    else
+        obj = [N; error; comp_time];
+        save(file, 'obj');
+        fprintf('graph_data.mat created. Dataset size, error, and computation time saved.\n')
+    end
 end
 
-%%%% FOR DEBUGGING: Check Negative-Definite Constraint %%%%
+%% %% FOR DEBUGGING: Check Negative-Definite Constraint %%%%
 if ctr_type == 0
     constr_violations = zeros(1,K);
     for k=1:K
