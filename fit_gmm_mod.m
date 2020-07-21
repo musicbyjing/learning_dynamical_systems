@@ -1,4 +1,4 @@
-function [Priors, Mu, Sigma] = fit_gmm_input(Xi_ref, Xi_dot_ref, est_options)
+function [Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, store_params, est_options)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) 2018 Learning Algorithms and Systems Laboratory,          %
 % EPFL, Switzerland                                                       %
@@ -214,21 +214,32 @@ switch est_type
         else
             k = fixed_K;
         end
-%         disp("K is: "); 
-%         disp(k);
+        
         % Train GMM with Optimal k
         warning('off', 'all'); % there are a lot of really annoying warnings when fitting GMMs
+        
         %fit a GMM to our data
-        GMM_full = fitgmdist([Xi_ref]', k, 'Start', 'plus', 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 10); 
-        warning('on', 'all');
+        if store_params == 0
+            GMM_full = fitgmdist([Xi_ref]', k, 'Start', 'plus', 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 10);
+        elseif store_params == 1
+            load(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "Mu", "Sigma");
+            fprintf("\n\nmu and Sigma loaded from saved_params.mat");
+            S = struct('mu', transpose(Mu), 'Sigma', Sigma);
+            GMM_full = fitgmdist(transpose(Xi_ref), k, 'Start', S, 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 1);
+        end
         
         % Extract Model Parameters
+        warning('on', 'all');
         Priors = GMM_full.ComponentProportion;
         Mu = transpose(GMM_full.mu);
         Sigma = GMM_full.Sigma;
-        save(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "Mu", "Sigma");
-        fprintf("mu and Sigma saved to saved_params.mat \n");
         
+        % Save parameters if appropriate
+        if store_params == 0
+            save(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "Mu", "Sigma");
+            fprintf("\n\nmu and Sigma saved to saved_params.mat \n");
+        end
+       
 
     case 2
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

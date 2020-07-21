@@ -26,6 +26,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Step 0 - Gather all user inputs
+
+close all; clear all; clc
+
 names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
     'heee','JShape','JShape_2','Khamesh','Leaf_1',...
     'Leaf_2','Line','LShape','NShape','PShape',...
@@ -52,7 +55,7 @@ s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
 s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
 prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
 ans = inputdlg(prompt);
-user_input = str2num(ans{:});
+user_input = str2num(ans{:})
 
 n = user_input(1);
 select_area = user_input(2);
@@ -63,7 +66,7 @@ store_params = user_input(4);
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Step 1 - OPTION 1 (DATA LOADING): Load CORL-paper Datasets %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% close all; clear all; clc
+
 %%%%%%%%%%%%%%%%%%%%%%%%% Select a Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1:  Messy Snake Dataset   (2D) *
 % 2:  L-shape Dataset       (2D) *
@@ -160,7 +163,7 @@ est_options.length_scale     = [];  % if estimate_l=0 you can define your own
 %% Fit GMM to Trajectory Data
 
 % Decide if using all data or just part of it
-fprintf('The original dataset size is  %d x %d.', size(Xi_ref));
+fprintf('\n\nThe original dataset size is  %d x %d.', size(Xi_ref));
 if select_area == 1
 % ------- User input version -------
 %     fprintf("\nInput the area you want to select data from, one coordinate at a time, in the following order: \n x_min, x_max, y_min, y_max");
@@ -180,7 +183,7 @@ if select_area == 1
     end
     Xi_ref = selected_data;
     Xi_dot_ref = selected_data_dot;
-    fprintf('The dataset size after selecting an area is %d x %d.', size(Xi_ref));
+    fprintf('\n\nThe dataset size after selecting an area is %d x %d.', size(Xi_ref));
 end
 
 % Randomly delete some of the data
@@ -189,14 +192,10 @@ num_to_remove = int16(prop_to_delete * dataset_size);
 permutation = randperm(dataset_size);
 Xi_ref(:, permutation(1:num_to_remove)) = [];
 Xi_dot_ref(:, permutation(1:num_to_remove)) = [];
-fprintf('The dataset size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
+fprintf('\n\nThe dataset size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
 
-% Decide if fitting from scratch or using previously saved parameters
-if store_params == 0
-    [Priors, Mu, Sigma] = fit_gmm_input(Xi_ref, Xi_dot_ref, est_options);
-elseif store_params == 1
-    [Priors, Mu, Sigma] = fit_gmm_output(Xi_ref, Xi_dot_ref, est_options);
-end
+% Fit from scratch or use previously saved parameters
+[Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, store_params, est_options);
 
 %% Generate GMM data structure for DS learning
 clear ds_gmm; 
@@ -252,7 +251,7 @@ if constr_type == 1
     [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Data_sh, zeros(M,1), constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x-repmat(att,[1 size(x,2)]), ds_gmm, A_k, b_k);
 else
-    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, att, constr_type, ds_gmm, P_opt, init_cvx);
+    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, att, constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x, ds_gmm, A_k, b_k);
 end
 
