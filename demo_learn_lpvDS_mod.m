@@ -24,10 +24,46 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General%
 % Public License for more details                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Step 0 - Gather all user inputs
+names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
+    'heee','JShape','JShape_2','Khamesh','Leaf_1',...
+    'Leaf_2','Line','LShape','NShape','PShape',...
+    'RShape','Saeghe','Sharpc','Sine','Snake',...
+    'Spoon','Sshape','Trapezoid','Worm','WShape','Zshape',...
+    'Multi_Models_1', 'Multi_Models_2', 'Multi_Models_3','Multi_Models_4'};
+n = -1; c = 0;
+fprintf('\nAvailable Models:\n')
+for i=1:8
+    for j=1:5
+        c=c+1;
+        if c > 37
+            break;
+        end
+        fprintf('%2u) %-18s',(i-1)*4+j,names{(i-1)*4+j})
+    end
+    fprintf('\n')
+end
+
+s1 = 'Enter the following as numbers separated by spaces: ';
+s2 = '1) Model number (int; see command window);';
+s3 = '2) 0 to use all data, 1 to select an area;';
+s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
+s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
+prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
+ans = inputdlg(prompt);
+user_input = str2num(ans{:});
+
+n = user_input(1);
+select_area = user_input(2);
+prop_to_delete = user_input(3);
+store_params = user_input(4);
+
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Step 1 - OPTION 1 (DATA LOADING): Load CORL-paper Datasets %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-close all; clear all; clc
+% close all; clear all; clc
 %%%%%%%%%%%%%%%%%%%%%%%%% Select a Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1:  Messy Snake Dataset   (2D) *
 % 2:  L-shape Dataset       (2D) *
@@ -41,21 +77,21 @@ close all; clear all; clc
 % 10: CShape all            (3D) -- x trajectories recorded at 100Hz
 % 11: Flat-C for loco-manip (2D) * 3 trajectories recorded at 100Hz (downsampled to 50Hz)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-addpath(genpath(pwd));
-pkg_dir         = './';
-chosen_dataset  = 1; 
-sub_sample      = 1; % '>2' for real 3D Datasets, '1' for 2D toy datasets % originally 5
-nb_trajectories = 0; % For real 3D data only % originally 3
-[Data, Data_sh, att, x0_all, data, dt] = load_dataset_DS(pkg_dir, chosen_dataset, sub_sample, nb_trajectories);
-
-% Position/Velocity Trajectories
-vel_samples = 50; vel_size = 0.75; 
-[h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
-
-% Extract Position and Velocities
-M          = size(Data,1)/2;    
-Xi_ref     = Data(1:M,:);
-Xi_dot_ref = Data(M+1:end,:);   
+% addpath(genpath(pwd));
+% pkg_dir         = './';
+% chosen_dataset  = 1; 
+% sub_sample      = 1; % '>2' for real 3D Datasets, '1' for 2D toy datasets % originally 5
+% nb_trajectories = 0; % For real 3D data only % originally 3
+% [Data, Data_sh, att, x0_all, data, dt] = load_dataset_DS(pkg_dir, chosen_dataset, sub_sample, nb_trajectories);
+% 
+% % Position/Velocity Trajectories
+% vel_samples = 50; vel_size = 0.75; 
+% [h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
+% 
+% % Extract Position and Velocities
+% M          = size(Data,1)/2;    
+% Xi_ref     = Data(1:M,:);
+% Xi_dot_ref = Data(M+1:end,:);   
 
 %% %%%%%%%%%%%% [Optional] Load pre-learned lpv-DS model from Mat file  %%%%%%%%%%%%%%%%%%%
 % DS_name = '/3D-Sink/3D-Sink_pqlf_2';
@@ -72,12 +108,12 @@ Xi_dot_ref = Data(M+1:end,:);
 %%  Step 1 - OPTION 2 (DATA LOADING): Load Motions from LASA Handwriting Dataset %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Choose DS LASA Dataset to load
-clear all; close all; clc
+% clear all; close all; clc
 
 % Select one of the motions from the LASA Handwriting Dataset
 sub_sample      = 5; % Each trajectory has 1000 samples when set to '1'
 nb_trajectories = 7; % Maximum 7, will select randomly if <7
-[Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS(sub_sample, nb_trajectories);
+[Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS_mod(n, names, sub_sample, nb_trajectories);
 
 % Position/Velocity Trajectories
 vel_samples = 15; vel_size = 0.5; 
@@ -125,11 +161,7 @@ est_options.length_scale     = [];  % if estimate_l=0 you can define your own
 
 % Decide if using all data or just part of it
 fprintf('The original dataset size is  %d x %d.', size(Xi_ref));
-user_input = input("\n\nType 0 to use all data, 1 to select an area: ");
-if user_input < 0 || user_input > 1
-    fprintf("Wrong number! Please type a number between 0 and 1.")
-    return;
-elseif user_input == 1
+if select_area == 1
 % ------- User input version -------
 %     fprintf("\nInput the area you want to select data from, one coordinate at a time, in the following order: \n x_min, x_max, y_min, y_max");
 %     bounds = zeros(1,4);
@@ -152,27 +184,17 @@ elseif user_input == 1
 end
 
 % Randomly delete some of the data
-user_input = input("\n\nWhat proportion (0-1) of the data should be randomly deleted? ");
-if user_input < 0 || user_input > 1
-    fprintf("Please type a decimal between 0 and 1.")
-    return;
-else
-    dataset_size = size(Xi_ref, 2);
-    num_to_remove = int16(user_input * dataset_size);
-    permutation = randperm(dataset_size);
-    Xi_ref(:, permutation(1:num_to_remove)) = [];
-    Xi_dot_ref(:, permutation(1:num_to_remove)) = [];
-    fprintf('The dataset size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
-end
+dataset_size = size(Xi_ref, 2);
+num_to_remove = int16(prop_to_delete * dataset_size);
+permutation = randperm(dataset_size);
+Xi_ref(:, permutation(1:num_to_remove)) = [];
+Xi_dot_ref(:, permutation(1:num_to_remove)) = [];
+fprintf('The dataset size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
 
 % Decide if fitting from scratch or using previously saved parameters
-user_input = input("\n\nType 0 for input, 1 for output: ");
-if user_input < 0 || user_input > 1
-    fprintf("Wrong number! Please type a number between 0 and 1.")
-    return;
-elseif user_input == 0
+if store_params == 0
     [Priors, Mu, Sigma] = fit_gmm_input(Xi_ref, Xi_dot_ref, est_options);
-elseif user_input == 1
+elseif store_params == 1
     [Priors, Mu, Sigma] = fit_gmm_output(Xi_ref, Xi_dot_ref, est_options);
 end
 
