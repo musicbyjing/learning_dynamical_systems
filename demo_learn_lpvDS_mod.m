@@ -100,7 +100,7 @@ est_options.type             = 1;   % GMM Estimation Alorithm Type
 
 % If algo 1 selected:
 est_options.maxK             = 10;  % Maximum Gaussians for Type 1
-est_options.fixed_K          = [];  % Fix K and estimate with EM for Type 1; ORIGINALLY []
+est_options.fixed_K          = 1;  % Fix K and estimate with EM for Type 1; ORIGINALLY []
 
 % If algo 0 or 2 selected:
 est_options.samplerIter      = 50;  % Maximum Sampler Iterations

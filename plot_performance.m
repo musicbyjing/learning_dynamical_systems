@@ -22,6 +22,6 @@ subplot(1,2,2)
 plot(X, Y2, 'b-o')
 title('Dataset size vs. computation time')
 xlabel('Dataset size')
-ylabel('computation time')
+ylabel('Computation time')
 
 end

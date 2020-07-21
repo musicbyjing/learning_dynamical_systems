@@ -107,7 +107,7 @@ for k = 1:K
 end
 
 % Calculate our estimated velocities caused by each local behavior
-Xi_d_dot_c_raw = sdpvar(M,N,K, 'full');%zeros(size(Qd));
+Xi_d_dot_c_raw = sdpvar(M,N,K, 'full'); %zeros(size(Qd));
 for k = 1:K
     h_K = repmat(h_k(k,:),[M 1]);
     if ctr_type == 1
@@ -115,7 +115,11 @@ for k = 1:K
     else
         f_k = A_vars{k}*Xi_ref + repmat(b_vars{k},[1 N]);
     end
-    Xi_d_dot_c_raw(:,:,k) = h_K.*f_k;
+    if K == 1
+        Xi_d_dot_c_raw(:,:) = h_K.*f_k;
+    else
+        Xi_d_dot_c_raw(:,:,k) = h_K.*f_k;
+    end
 end
 
 % Sum each of the local behaviors to generate the overall behavior at
