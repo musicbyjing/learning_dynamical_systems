@@ -137,7 +137,7 @@ elseif user_input == 1
 %         bounds(j) = input("\nType a coordinate: ");
 %     end
 % ------- Hardcoded version -------
-    bounds = [19, 30, -20, 21]; % values derived from looking at the biggest cluster in LASA datasets 7 and 8
+    bounds = [22, 30, -10, 20]; % values derived from looking at the biggest cluster in LASA datasets 7 and 8
     selected_data = [];
     selected_data_dot = [];
     for j = 1:numel(Xi_ref)/2
