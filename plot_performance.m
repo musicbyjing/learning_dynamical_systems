@@ -3,9 +3,9 @@ function [] = plot_performance()
 file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
 load(file, 'obj');
 
-obj = obj.'
-obj = sortrows(obj)
-obj = obj.' % sort matrix such that dataset size is in ascending order
+obj = obj.';
+obj = sortrows(obj);
+obj = obj.'; % sort matrix such that dataset size is in ascending order
 
 X = obj(1,:);
 Y1 = obj(2,:); % error

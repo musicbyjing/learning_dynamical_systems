@@ -179,7 +179,7 @@ check(Constraints)
 fprintf('Total error: %2.2f\nComputation Time: %2.2f\n', value(Objective),sol.solvertime);
 
 %% % save to graph_data.mat if learning from prior data
-if store_params == 1 
+if store_params == 1
     error = typecast(value(Objective), 'double');
     comp_time = typecast(sol.solvertime, 'double');
     file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
