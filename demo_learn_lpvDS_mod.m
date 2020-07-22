@@ -193,13 +193,23 @@ if select_area == 1
     fprintf('\n\nThe dataset size after selecting an area is %d x %d.', size(Xi_ref));
 end
 
+% Separate a test set from the training data
+dataset_size = size(Xi_ref, 2);
+test_size = int16(test_set_prop * dataset_size);
+permutation = randperm(dataset_size);
+test_Xi = Xi_ref(:, permutation(1:test_size)); % test set
+test_Xi_dot = Xi_dot_ref(:, permutation(1:test_size)); % test set
+Xi_ref = Xi_ref(:, permutation(test_size+1:dataset_size)); % remaining training set
+Xi_dot_ref = Xi_dot_ref(:, permutation(test_size+1:dataset_size)); % remaining training set
+fprintf('\n\nThe test set size is %d x %d and the training set size is %d x %d.', size(test_Xi), size(Xi_ref)); 
+
 % Randomly delete some of the data
 dataset_size = size(Xi_ref, 2);
 num_to_remove = int16(prop_to_delete * dataset_size);
 permutation = randperm(dataset_size);
 Xi_ref(:, permutation(1:num_to_remove)) = [];
 Xi_dot_ref(:, permutation(1:num_to_remove)) = [];
-fprintf('\n\nThe dataset size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
+fprintf('\n\nThe training set size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
 
 % Fit from scratch or use previously saved parameters
 [Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, store_params, est_options);

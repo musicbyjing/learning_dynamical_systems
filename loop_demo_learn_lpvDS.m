@@ -8,6 +8,7 @@ n = 8;
 select_area = 1;
 % prop_to_delete assigned below
 store_params = 1;
+test_set_prop = 0.2;
 
 props = 0:0.05:0.99;
 
