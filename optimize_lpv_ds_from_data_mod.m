@@ -60,13 +60,16 @@ switch ctr_type
         assign(P_var,eye(M));
         init_cvx = varargin{2};
         
+    % 7/23 currently using this case    
     case 2
         % 'penlab': Nonlinear semidefinite programming solver
         sdp_options = sdpsettings('solver','penlab','verbose', 1,'usex0',1);
         P = varargin{1};
         init_cvx = varargin{2};
+    
 end
 
+% 7/23 not relevant
 if init_cvx
     % Solve Problem with Convex constraints first to get A's
     fprintf('Solving Optimization Problem with Convex Constraints for Non-Convex Initialization...\n');
@@ -178,23 +181,6 @@ sol.info
 check(Constraints)
 fprintf('Total error: %2.2f\nComputation Time: %2.2f\n', value(Objective),sol.solvertime);
 
-%% % save to graph_data.mat if learning from prior data
-if store_params == 1
-    error = typecast(value(Objective), 'double');
-    comp_time = typecast(sol.solvertime, 'double');
-    file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
-    if isfile(file)
-        load(file, 'obj');
-        temp = [N; error; comp_time];
-        obj = [obj temp];
-        save(file, 'obj');
-        fprintf('Dataset size, error, and computation time appended to graph_data.mat.\n')
-    else
-        obj = [N; error; comp_time];
-        save(file, 'obj');
-        fprintf('graph_data.mat created. Dataset size, error, and computation time saved.\n')
-    end
-end
 
 %% %% FOR DEBUGGING: Check Negative-Definite Constraint %%%%
 if ctr_type == 0

@@ -10,7 +10,7 @@ select_area = 1;
 store_params = 1;
 test_set_prop = 0.2;
 
-props = 0:0.05:0.99;
+props = 0:0.05:0.95;
 
 for j = 1:length(props)
     prop_to_delete = props(j);
