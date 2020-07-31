@@ -63,6 +63,7 @@ names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
 % select_area = user_input(2);
 % prop_to_delete = user_input(3);
 % store_params = user_input(4);
+% test_set_prop = 0.2;
 
 %% Step 0 - OPTION 2: Hardcoded options (to run this file in a loop)
 % Comment out Step 0 OPTION 1 and run `loop_demo_learn_lpvDS` with the
@@ -116,6 +117,7 @@ names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
 %%  Step 1 - OPTION 2 (DATA LOADING): Load Motions from LASA Handwriting Dataset %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Choose DS LASA Dataset to load
+
 % clear all; close all; clc
 
 % Select one of the motions from the LASA Handwriting Dataset
@@ -194,6 +196,7 @@ end
 % Separate a test set from the training data
 dataset_size = size(Xi_ref, 2);
 test_size = int16(test_set_prop * dataset_size);
+rng(1); % Set a seed so that the same test set is chosen each time
 permutation = randperm(dataset_size);
 
 Xi_ref_test = Xi_ref(:, permutation(1:test_size)); % test set
@@ -210,6 +213,9 @@ Xi_ref(:, permutation(1:num_to_remove)) = [];
 Xi_dot_ref(:, permutation(1:num_to_remove)) = [];
 fprintf('\n\nThe training set size after randomly deleting %d elements is %d x %d.', num_to_remove, size(Xi_ref));
 dataset_size = size(Xi_ref, 2);
+
+Data_sh = [Xi_ref Xi_dot_ref];
+% Data = Data_sh;
 
 % Fit from scratch or use previously saved parameters
 [Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, store_params, est_options);
@@ -251,6 +257,8 @@ constr_type = 2;      % 0:'convex':     A' + A < 0 (Proposed in paper)
                       % 2:'non-convex': A'P + PA < -Q given P (Proposed in paper)                                 
 init_cvx    = 0;      % 0/1: initialize non-cvx problem with cvx                
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 if constr_type == 0 || constr_type == 1
     P_opt = eye(M);
 else
