@@ -36,34 +36,34 @@ names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
 
 %% Step 0 - OPTION 1: Gather user inputs
 
-% n = -1; c = 0;
-% fprintf('\nAvailable Models:\n')
-% for i=1:8
-%     for j=1:5
-%         c=c+1;
-%         if c > 37
-%             break;
-%         end
-%         fprintf('%2u) %-18s',(i-1)*4+j,names{(i-1)*4+j})
-%     end
-%     fprintf('\n')
-% end
-% 
-% % Prompt
-% s1 = 'Enter the following as numbers separated by spaces: ';
-% s2 = '1) Model number (int; see command window);';
-% s3 = '2) 0 to use all data, 1 to select an area;';
-% s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
-% s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
-% prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
-% ans = inputdlg(prompt);
-% user_input = str2num(ans{:})
-% 
-% n = user_input(1);
-% select_area = user_input(2);
-% prop_to_delete = user_input(3);
-% store_params = user_input(4);
-% test_set_prop = 0.2;
+n = -1; c = 0;
+fprintf('\nAvailable Models:\n')
+for i=1:8
+    for j=1:5
+        c=c+1;
+        if c > 37
+            break;
+        end
+        fprintf('%2u) %-18s',(i-1)*4+j,names{(i-1)*4+j})
+    end
+    fprintf('\n')
+end
+
+% Prompt
+s1 = 'Enter the following as numbers separated by spaces: ';
+s2 = '1) Model number (int; see command window);';
+s3 = '2) 0 to use all data, 1 to select an area;';
+s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
+s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
+prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
+ans = inputdlg(prompt);
+user_input = str2num(ans{:})
+
+n = user_input(1);
+select_area = user_input(2);
+prop_to_delete = user_input(3);
+store_params = user_input(4);
+test_set_prop = 0.2;
 
 %% Step 0 - OPTION 2: Hardcoded options (to run this file in a loop)
 % Comment out Step 0 OPTION 1 and run `loop_demo_learn_lpvDS` with the
