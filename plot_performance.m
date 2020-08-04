@@ -1,6 +1,6 @@
 function [] = plot_performance()
 
-file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data2.mat');
+file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
 load(file, 'graph_data');
 
 graph_data = graph_data.';

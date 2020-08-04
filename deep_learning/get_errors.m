@@ -17,6 +17,6 @@ for i=1:N
         trajectory_edot(1,i) = 0;
     end
 end
-edot = trajectory_edot;
+edot = mean(trajectory_edot);
 
 end
