@@ -1,4 +1,4 @@
-function [h,xd] = plot_ds_model_mod(A,fig, ds, target, limits, varargin)
+function [h,xd] = plot_ds_model_mod(A, fig, target, limits, varargin)
 
 quality='medium';
 

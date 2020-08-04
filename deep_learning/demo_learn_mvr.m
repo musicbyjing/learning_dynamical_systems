@@ -68,7 +68,7 @@ store_params = user_input(4);
 test_set_prop = 0.2;
 
 %% Step 0 - OPTION 2: Hardcoded options (to run this file in a loop)
-% Comment out Step 0 OPTION 1 and run `loop_demo_learn_lpvDS` with the
+% Comment out Step 0 OPTION 1 and run `loop_demo` with the
 % desired parameters
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -157,7 +157,6 @@ dataset_size = size(Xi_ref, 2);
 % Data_sh = [Xi_ref Xi_dot_ref];
 % Data = Data_sh;
 
-
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%  Step 3 (DS ESTIMATION): ESTIMATE SYSTEM DYNAMICS MATRICES  %%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -169,13 +168,12 @@ Y = Xi_dot_ref.';
 
 [beta,Sigma] = mvregress(X,Y);
 
-A = X \ Y; % XA = Y
+A = X \ Y; % to solve XA = Y
 
 % [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, att, constr_type, ds_gmm, P_opt, init_cvx);
-ds_gmm.Priors = 1;
-ds_gmm.Mu = zeros([2, 1]);
-ds_gmm.Sigma = zeros(2);
-% ds_lpv = @(x) lpv_ds(x, ds_gmm, A);
+% ds_gmm.Priors = 1;
+% ds_gmm.Mu = zeros([2, 1]);
+% ds_gmm.Sigma = zeros(2);
 
 %% %%%%%%%%%%%%    Plot Resulting DS  %%%%%%%%%%%%%%%%%%%
 % Fill in plotting options
@@ -187,7 +185,7 @@ ds_plot_options.init_type = 'ellipsoid';       % For 3D DS, to initialize stream
 ds_plot_options.nb_points = 30;           % No of streamlines to plot (3D)
 ds_plot_options.plot_vol  = 1;            % Plot volume of initial points (3D)
 
-[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A,Xi_ref, ds_lpv, ds_plot_options);
+[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A,Xi_ref, ds_plot_options);
 limits = axis;
 title('Multivariate Linear Regression')
 
@@ -197,7 +195,7 @@ title('Multivariate Linear Regression')
 %% Compute Errors
 % Compute RMSE
 
-errors = get_errors(Xi_ref_test, Xi_dot_ref_test, A);
+[rmse, edot] = get_errors(Xi_ref_test, Xi_dot_ref_test, A);
 
 fprintf('mvregression, got prediction RMSE on test set: %d \n', rmse);
 fprintf('mvregression, got prediction edot on test set: %d \n', edot);
@@ -219,57 +217,12 @@ end
 return;
 
 % Compare Velocities from Demonstration vs DS
-h_vel = visualizeEstimatedVelocities(Data, ds_lpv);
+% REMOVED
 
 %% Optional save reference trajectories with computed velocities for C++ class testing
-% xd_dot = [];
-% % Simulate velocities from same reference trajectory
-% for i=1:N
-%     xd_dot_ = ds_lpv(Data(1:M,i));    
-%     % Record Trajectories
-%     xd_dot = [xd_dot xd_dot_];        
-% end
-% 
-% model_dir = strcat(pkg_dir,'/models/',DS_name, '/');
-% % Writing Data
-% dlmwrite(strcat(model_dir,'Data'), Data, 'newline','unix','Delimiter',' ','precision','%.6f');
-% 
-% % Writing xi_dot
-% dlmwrite(strcat(model_dir,'xi_dot'), xd_dot, 'newline','unix','Delimiter',' ','precision','%.6f');
+% REMOVED
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%     Step 5 (Optional - Stability Check 2D-only): Plot Lyapunov Function and derivative  %%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Type of plot
-contour = 1; % 0: surf, 1: contour
-clear lyap_fun_comb lyap_der 
-
-switch constr_type
-    case 0 
-        P = eye(2);
-        title_string = {'$V(\xi) = (\xi-\xi^*)^T(\xi-\xi^*)$'};
-    case 1
-        P = P_est;
-        title_string = {'$V(\xi) = (\xi-\xi^*)^TP(\xi-\xi^*)$'};
-    case 2
-        P = P_opt;
-        title_string = {'$V(\xi) = (\xi-\xi^*)^TP(\xi-\xi^*)$'};
-end
-
-if M == 2
-    % Lyapunov function
-    lyap_fun = @(x)lyapunov_function_PQLF(x, att, P);
-    
-    % Derivative of Lyapunov function (gradV*f(x))
-    lyap_der = @(x)lyapunov_derivative_PQLF(x, att, P, ds_lpv);
-    title_string_der = {'Lyapunov Function Derivative $\dot{V}(\xi)$'};
-    
-    % Plots
-    h_lyap     = plot_lyap_fct(lyap_fun, contour, limits,  title_string, 0);
-    [hd] = scatter(Data(1,:),Data(2,:),10,[1 1 0],'filled'); hold on;
-    h_lyap_der = plot_lyap_fct(lyap_der, contour, limits,  title_string_der, 1);
-    [hd] = scatter(Xi_ref(1,:),Xi_ref(2,:),10,[1 1 0],'filled'); hold on;
-else
-    clc;
-    fprintf(2,'Lyapunov Function Plotting: Not possible for 3D data.\n')    
-end
+% REMOVED

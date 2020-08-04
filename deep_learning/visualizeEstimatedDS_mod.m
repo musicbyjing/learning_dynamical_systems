@@ -1,4 +1,4 @@
-function [hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A,Xi_ref, ds_fun, ds_plot_options)
+function [hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A,Xi_ref, ds_plot_options)
 fig1 = figure('Color',[1 1 1]);
 M = size(Xi_ref,1);
 
@@ -47,7 +47,7 @@ if M == 2
         limits = axis;
         limits_ = limits + [-0.015 0.015 -0.015 0.015];
     end
-    [hs] = plot_ds_model_mod(A,fig1, ds_fun, [0 0]', limits_,'medium'); hold on;
+    [hs] = plot_ds_model_mod(A,fig1, [0 0]', limits_,'medium'); hold on;
     axis(limits_)
     box on
     grid on

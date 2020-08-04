@@ -4,6 +4,7 @@
 delete(fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat'));
 
 % Parameters to be set
+script = "demo_learn_kernel.m";
 n = 8;
 select_area = 1;
 % prop_to_delete assigned below
@@ -14,5 +15,5 @@ props = 0:0.05:0.95;
 
 for j = 1:length(props)
     prop_to_delete = props(j);
-    run("demo_learn_lpvDS_mod.m")
+    run(script)
 end
