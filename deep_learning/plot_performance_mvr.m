@@ -16,6 +16,8 @@ rmse = graph_data(2,:);
 edot = graph_data(3,:);
 
 figure
+sgtitle('mvr')
+
 subplot(2,1,1)
 plot(X, rmse, 'Color', '#0072BD', 'Marker', 'o')
 hold on;

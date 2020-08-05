@@ -4,11 +4,11 @@
 delete(fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat'));
 
 % Parameters to be set
-script = "demo_learn_kernel.m";
+script = "demo_learn_mvr.m";
 n = 8;
 select_area = 1;
 % prop_to_delete assigned below
-store_params = 1;
+store_params = 0;
 test_set_prop = 0.2;
 
 props = 0:0.05:0.95;

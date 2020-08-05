@@ -57,14 +57,20 @@ s2 = '1) Model number (int; see command window);';
 s3 = '2) 0 to use all data, 1 to select an area;';
 s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
 s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
-prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
-ans = inputdlg(prompt);
-user_input = str2num(ans{:})
 
-n = user_input(1);
-select_area = user_input(2);
-prop_to_delete = user_input(3);
-store_params = user_input(4);
+% prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
+% ans = inputdlg(prompt);
+% user_input = str2num(ans{:})
+% n = user_input(1);
+% select_area = user_input(2);
+% prop_to_delete = user_input(3);
+% store_params = user_input(4);
+% test_set_prop = 0.2;
+
+n = 7;
+select_area = 1;
+prop_to_delete = 0;
+store_params = 0;
 test_set_prop = 0.2;
 
 %% Step 0 - OPTION 2: Hardcoded options (to run this file in a loop)
@@ -92,8 +98,8 @@ nb_trajectories = 7; % Maximum 7, will select randomly if <7
 [Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS_mod(n, names, sub_sample, nb_trajectories);
 
 % Position/Velocity Trajectories
-vel_samples = 15; vel_size = 0.5; 
-[h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
+% vel_samples = 15; vel_size = 0.5; 
+% [h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
 
 % Extract Position and Velocities
 M          = size(Data,1)/2;    
@@ -175,20 +181,37 @@ Y_test = Xi_dot_ref_test;
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%  Step 3 (DS ESTIMATION): ESTIMATE SYSTEM DYNAMICS MATRICES  %%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% REMOVED
 
-X = Xi_ref;
-X = X.';
-Y = Xi_dot_ref.';
+numFeatures = 2;
+numHiddenUnits = 125;
+numResponses = 2;
 
-[beta,Sigma] = mvregress(X,Y);
+layers = [ ...
+    sequenceInputLayer(numFeatures)
+    flattenLayer
+    lstmLayer(numHiddenUnits,'OutputMode','sequence')
+    fullyConnectedLayer(numResponses)
+    regressionLayer];
 
-A = X \ Y; % to solve XA = Y
+maxEpochs = 100;
+miniBatchSize = 20;
 
-% [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, att, constr_type, ds_gmm, P_opt, init_cvx);
-% ds_gmm.Priors = 1;
-% ds_gmm.Mu = zeros([2, 1]);
-% ds_gmm.Sigma = zeros(2);
+options = trainingOptions('adam', ...
+    'ExecutionEnvironment','cpu', ...
+    'MaxEpochs',maxEpochs, ...
+    'MiniBatchSize',miniBatchSize, ...
+    'GradientThreshold',1, ...
+    'Verbose',false, ...
+    'Plots','training-progress');
+
+net = trainNetwork(X_train, Y_train, layers, options);
+
+Y_pred = predict(net, X_test, 'MiniBatchSize', miniBatchSize);
+
+acc = sum(Y_pred == Y_test)./numel(Y_test);
+disp(mean(acc))
+
+return;
 
 %% %%%%%%%%%%%%    Plot Resulting DS  %%%%%%%%%%%%%%%%%%%
 % Fill in plotting options

@@ -22,31 +22,32 @@ mean_dtwd_train = graph_data(8,:);
 std_dtwd_train = graph_data(9,:);
 
 figure
-subplot(2,2,1)
+sgtitle('lpv')
+subplot(2,1,1)
 plot(X, rmse_test, 'Color', '#0072BD', 'Marker', 'o')
 hold on;
-plot(X, rmse_train, 'Color', '#7E2F8E', 'Marker', 's')
-legend('test', 'train')
+% plot(X, rmse_train, 'Color', '#7E2F8E', 'Marker', 's')
+% legend('test', 'train')
 title('Dataset size vs. RMSE')
 xlabel('Dataset size')
 ylabel('RMSE')
 
-subplot(2,2,2)
+subplot(2,1,2)
 plot(X, edot_test, 'Color', '#D95319', 'Marker', 'o')
 hold on;
-plot(X, edot_train, 'Color', '#77AC30', 'Marker', 's')
-legend('test', 'train')
+% plot(X, edot_train, 'Color', '#77AC30', 'Marker', 's')
+% legend('test', 'train')
 title('Dataset size vs. e dot')
 xlabel('Dataset size')
 ylabel('e dot')
 
-subplot(2,2,3)
-errorbar(X, mean_dtwd_test, std_dtwd_test, 'Color', '#EDB120', 'Marker', 'o')
-hold on;
-errorbar(X, mean_dtwd_train, std_dtwd_train, 'Color', '#4DBEEE', 'Marker', 's')
-legend('test', 'train')
-title('Dataset size vs. mean DTWD')
-xlabel('Dataset size')
-ylabel('Mean DTWD')
+% subplot(2,2,3)
+% errorbar(X, mean_dtwd_test, std_dtwd_test, 'Color', '#EDB120', 'Marker', 'o')
+% hold on;
+% errorbar(X, mean_dtwd_train, std_dtwd_train, 'Color', '#4DBEEE', 'Marker', 's')
+% legend('test', 'train')
+% title('Dataset size vs. mean DTWD')
+% xlabel('Dataset size')
+% ylabel('Mean DTWD')
 
 end
