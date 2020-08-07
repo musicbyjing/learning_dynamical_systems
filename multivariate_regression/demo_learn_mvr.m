@@ -216,7 +216,7 @@ title('Multivariate Linear Regression')
 %% Compute Errors
 % Compute RMSE
 
-[rmse, edot] = get_errors(Xi_ref_test, Xi_dot_ref_test, A);
+[rmse, edot] = get_errors_mvr(Xi_ref_test, Xi_dot_ref_test, A);
 
 fprintf('mvregression, got prediction RMSE on test set: %d \n', rmse);
 fprintf('mvregression, got prediction edot on test set: %d \n', edot);

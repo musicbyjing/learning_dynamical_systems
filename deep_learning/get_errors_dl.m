@@ -1,4 +1,4 @@
-function [rmse, edot] = get_errors(X, Y, A) 
+function [rmse, edot] = get_errors_mvr(X, Y, A) 
 
 Y_pred = (X'*A)';
 
