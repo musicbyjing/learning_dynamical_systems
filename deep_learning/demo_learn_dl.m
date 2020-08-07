@@ -98,8 +98,8 @@ nb_trajectories = 7; % Maximum 7, will select randomly if <7
 [Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS_mod(n, names, sub_sample, nb_trajectories);
 
 % Position/Velocity Trajectories
-% vel_samples = 15; vel_size = 0.5; 
-% [h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
+vel_samples = 15; vel_size = 0.5; 
+[h_data, h_att, h_vel] = plot_reference_trajectories_DS(Data, att, vel_samples, vel_size);
 
 % Extract Position and Velocities
 M          = size(Data,1)/2;    
@@ -224,10 +224,14 @@ end
 
 % FIGURE OUT ACCURACY
 
-[x_tmp, y_tmp]=meshgrid(200, 200);
+limits = axis;
+axlim = limits + [-0.015 0.015 -0.015 0.015]; % taken from visualizeEstimatedDs
+ax_x = linspace(axlim(1), axlim(2),200); % taken from plot_ds_model
+ax_y = linspace(axlim(3), axlim(4),200);
+[x_tmp, y_tmp]=meshgrid(ax_x, ax_y);
 x=[x_tmp(:), y_tmp(:)]';
-Y_pred = predict(net, x);
 
+Y_pred = predict(net, x);
 
 %% %%%%%%%%%%%%    Plot Resulting DS  %%%%%%%%%%%%%%%%%%%
 % Fill in plotting options
@@ -239,11 +243,9 @@ ds_plot_options.init_type = 'ellipsoid';       % For 3D DS, to initialize stream
 ds_plot_options.nb_points = 30;           % No of streamlines to plot (3D)
 ds_plot_options.plot_vol  = 1;            % Plot volume of initial points (3D)
 
-A = [0, 0]; % dummy, not needed
-
 [hd, hs, hr, x_sim] = visualizeEstimatedDS_mod('dl', [], Xi_ref, Y_pred, ds_plot_options);
 limits = axis;
-title('Multivariate Linear Regression')
+title('Series Neural Network')
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%   Step 4 (Evaluation): Compute Metrics and Visualize Velocities %%
