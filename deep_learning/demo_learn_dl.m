@@ -201,7 +201,7 @@ layers = [ ...
     fullyConnectedLayer(numResponses)
     regressionLayer];
 
-maxEpochs = 200;
+maxEpochs = 1000;
 miniBatchSize = 20;
 
 options = trainingOptions('adam', ...
@@ -213,13 +213,20 @@ options = trainingOptions('adam', ...
     'Verbose',false, ...
     'Plots','training-progress');
 
-net = trainNetwork(X_train, Y_train, layers, options);
-
+% Load or train NN
+file = fullfile(pwd, 'learning_dynamical_systems', 'deep_learning', 'models', 'net.mat');
+if isfile(file)
+    net = load(file, 'net').net;
+else
+    net = trainNetwork(X_train, Y_train, layers, options);
+    save(file, 'net');
+end
 
 % FIGURE OUT ACCURACY
 
 [x_tmp, y_tmp]=meshgrid(200, 200);
-Y_pred = predict(net, x_tmp);
+x=[x_tmp(:), y_tmp(:)]';
+Y_pred = predict(net, x);
 
 
 %% %%%%%%%%%%%%    Plot Resulting DS  %%%%%%%%%%%%%%%%%%%
@@ -232,7 +239,9 @@ ds_plot_options.init_type = 'ellipsoid';       % For 3D DS, to initialize stream
 ds_plot_options.nb_points = 30;           % No of streamlines to plot (3D)
 ds_plot_options.plot_vol  = 1;            % Plot volume of initial points (3D)
 
-[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A, Y_pred, ds_plot_options);
+A = [0, 0]; % dummy, not needed
+
+[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod('dl', [], Xi_ref, Y_pred, ds_plot_options);
 limits = axis;
 title('Multivariate Linear Regression')
 

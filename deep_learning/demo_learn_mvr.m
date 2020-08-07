@@ -206,7 +206,7 @@ ds_plot_options.init_type = 'ellipsoid';       % For 3D DS, to initialize stream
 ds_plot_options.nb_points = 30;           % No of streamlines to plot (3D)
 ds_plot_options.plot_vol  = 1;            % Plot volume of initial points (3D)
 
-[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A, Xi_ref, Xi_ref_test, Xi_dot_ref_test, ds_plot_options);
+[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod('mvr', A, Xi_ref, [], ds_plot_options);
 limits = axis;
 title('Multivariate Linear Regression')
 

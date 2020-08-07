@@ -1,4 +1,4 @@
-function [h,xd] = plot_ds_model_mod(A, X_test, Y_test, fig, target, limits, varargin)
+function [h,xd] = plot_ds_model_mod(method, A, Y_pred, fig, target, limits, varargin)
 
 quality='medium';
 
@@ -28,45 +28,16 @@ x=[x_tmp(:), y_tmp(:)]'; % 2 x 40000
 % still be in the bottom left corner
 x_ = x - repmat(target,1,size(x,2)); % 2 x 40000; 
 
-% vel_size = 0.5;
-% vel_points = [X_test; Y_test];
-% U = zeros(size(vel_points,2),1);
-% V = zeros(size(vel_points,2),1);
-% for i = 1:size(vel_points, 2)
-%     dir_    = vel_points(3:end,i)/norm(vel_points(3:end,i));
-%     U(i,1)   = dir_(1);
-%     V(i,1)   = dir_(2);
-% end
-% h_vel = quiver(vel_points(1,:)', vel_points(2,:)', U, V, vel_size, 'Color', 'k', 'LineWidth',2); hold on;
-% 
-% startx = 0.1:0.1:1;
-% starty = ones(size(startx));
-% 
-% 
-% vec = 1+0.1*(0:size(X_test, 2)-1);
-% [x,y] = meshgrid(vec,vec);
-% 
-% disp(size(x)) % 63 x 63
-% 
-% 
-% u = [vel_points(1,:)', vel_points(2,:)']'; % 2 x 63
-% v = [U, V]'; % 2 x 63
-% 
-% disp(size(u))
-% disp(size(v))
-% 
-% 
-% streamline(x,y,u,v,startx,starty)
-% 
-
 % xd = feval(ds, x_); % Original, for LPV-DS
-xd = (x_.' * A).'; % Y_pred, 40000 x 2
 
-% xd = Y_test'; % 63 x 2
+if strcmpi(method,'mvr')
+    xd = (x_.' * A).'; % Y_pred, 40000 x 2
+elseif strcmpi(method,'dl')
+    xd = Y_pred';
+end
 
 bob = reshape(xd(1,:),ny,nx)
 disp(size(x_tmp))
-return;
 
 h = streamslice(x_tmp,y_tmp,reshape(xd(1,:),ny,nx),reshape(xd(2,:),ny,nx),4,'method','cubic');
 set(h,'LineWidth', 0.75)
