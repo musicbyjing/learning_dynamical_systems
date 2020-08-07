@@ -231,7 +231,7 @@ ax_y = linspace(axlim(3), axlim(4),200);
 [x_tmp, y_tmp]=meshgrid(ax_x, ax_y);
 x=[x_tmp(:), y_tmp(:)]';
 
-Y_pred = predict(net, x);
+Y_pred = predict(net, x); % prediction on all space, necessary for DS plot
 
 %% %%%%%%%%%%%%    Plot Resulting DS  %%%%%%%%%%%%%%%%%%%
 % Fill in plotting options
@@ -253,10 +253,11 @@ title('Series Neural Network')
 %% Compute Errors
 % Compute RMSE
 
-[rmse, edot] = get_errors(Xi_ref_test, Xi_dot_ref_test, A);
+Y_pred = predict(net, X_test); % prediction on the test set
+[rmse, edot] = get_errors_dl(Y_test, Y_pred);
 
-fprintf('mvregression, got prediction RMSE on test set: %d \n', rmse);
-fprintf('mvregression, got prediction edot on test set: %d \n', edot);
+fprintf('dl, got prediction RMSE on test set: %d \n', rmse);
+fprintf('dl, got prediction edot on test set: %d \n', edot);
 
 % Store variables in graph_data.mat if learning from previous data
 file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
