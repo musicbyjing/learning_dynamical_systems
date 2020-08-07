@@ -165,18 +165,26 @@ dataset_size = size(Xi_ref, 2);
 % Data = Data_sh;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%  Step 2.5: Export Modified Dataset %%
+%%  Step 2.5: Split Modified Dataset %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% test/train split
 X_train = Xi_ref;
 Y_train = Xi_dot_ref;
 X_test = Xi_ref_test;
 Y_test = Xi_dot_ref_test;
 
+% train/val split
+idx = randperm(size(X_train,2), int16(dataset_size/5));
+X_val = X_train(:,idx);
+X_train(:,idx) = [];
+Y_val = Y_train(:,idx);
+Y_train(:,idx) = [];
+
+% In case dataset needs to be exported
 % file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'dataset_mod.mat');
 % save(file, 'X_train', 'Y_train', 'X_test', 'Y_test');
 % fprintf('Modified dataset saved to dataset_mod.mat.\n')
-
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%  Step 3 (DS ESTIMATION): ESTIMATE SYSTEM DYNAMICS MATRICES  %%%%%%%%%
@@ -193,12 +201,13 @@ layers = [ ...
     fullyConnectedLayer(numResponses)
     regressionLayer];
 
-maxEpochs = 100;
+maxEpochs = 200;
 miniBatchSize = 20;
 
 options = trainingOptions('adam', ...
     'ExecutionEnvironment','cpu', ...
     'MaxEpochs',maxEpochs, ...
+    'ValidationData',{X_val,Y_val}, ...
     'MiniBatchSize',miniBatchSize, ...
     'GradientThreshold',1, ...
     'Verbose',false, ...
@@ -206,12 +215,12 @@ options = trainingOptions('adam', ...
 
 net = trainNetwork(X_train, Y_train, layers, options);
 
-Y_pred = predict(net, X_test, 'MiniBatchSize', miniBatchSize);
 
-acc = sum(Y_pred == Y_test)./numel(Y_test);
-disp(mean(acc))
+% FIGURE OUT ACCURACY
 
-return;
+[x_tmp, y_tmp]=meshgrid(200, 200);
+Y_pred = predict(net, x_tmp);
+
 
 %% %%%%%%%%%%%%    Plot Resulting DS  %%%%%%%%%%%%%%%%%%%
 % Fill in plotting options
@@ -223,7 +232,7 @@ ds_plot_options.init_type = 'ellipsoid';       % For 3D DS, to initialize stream
 ds_plot_options.nb_points = 30;           % No of streamlines to plot (3D)
 ds_plot_options.plot_vol  = 1;            % Plot volume of initial points (3D)
 
-[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A,Xi_ref, ds_plot_options);
+[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A, Y_pred, ds_plot_options);
 limits = axis;
 title('Multivariate Linear Regression')
 

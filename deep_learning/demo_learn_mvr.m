@@ -57,14 +57,20 @@ s2 = '1) Model number (int; see command window);';
 s3 = '2) 0 to use all data, 1 to select an area;';
 s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
 s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
-prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
-ans = inputdlg(prompt);
-user_input = str2num(ans{:})
 
-n = user_input(1);
-select_area = user_input(2);
-prop_to_delete = user_input(3);
-store_params = user_input(4);
+% prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
+% ans = inputdlg(prompt);
+% user_input = str2num(ans{:})
+% n = user_input(1);
+% select_area = user_input(2);
+% prop_to_delete = user_input(3);
+% store_params = user_input(4);
+% test_set_prop = 0.2;
+
+n = 7;
+select_area = 1;
+prop_to_delete = 0;
+store_params = 0;
 test_set_prop = 0.2;
 
 %% Step 0 - OPTION 2: Hardcoded options (to run this file in a loop)
@@ -200,7 +206,7 @@ ds_plot_options.init_type = 'ellipsoid';       % For 3D DS, to initialize stream
 ds_plot_options.nb_points = 30;           % No of streamlines to plot (3D)
 ds_plot_options.plot_vol  = 1;            % Plot volume of initial points (3D)
 
-[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A,Xi_ref, ds_plot_options);
+[hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(A, Xi_ref, Xi_ref_test, Xi_dot_ref_test, ds_plot_options);
 limits = axis;
 title('Multivariate Linear Regression')
 
