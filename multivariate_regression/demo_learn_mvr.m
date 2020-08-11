@@ -67,7 +67,7 @@ s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
 % store_params = user_input(4);
 % test_set_prop = 0.2;
 
-n = 7;
+n = 8;
 select_area = 1;
 prop_to_delete = 0;
 store_params = 0;

@@ -27,7 +27,7 @@
 % Public License for more details                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-close all; clc;
+close all; clc; clear all;
 
 names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
     'heee','JShape','JShape_2','Khamesh','Leaf_1',...
@@ -67,8 +67,8 @@ s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
 % store_params = user_input(4);
 % test_set_prop = 0.2;
 
-n = 7;
-select_area = 1;
+n = 8;
+select_area = 0;
 prop_to_delete = 0;
 store_params = 0;
 test_set_prop = 0.2;
@@ -199,7 +199,10 @@ layers = [ ...
     flattenLayer
     lstmLayer(numHiddenUnits,'OutputMode','sequence')
     fullyConnectedLayer(numResponses)
-    regressionLayer];
+    log_barrier_regression_layer(X_train, [0;0])];
+
+% The built-in `regressionLayer` uses the half-MSE loss
+% The custom `log_barrier_regression_layer` uses a log barrier + MSE loss
 
 maxEpochs = 1000;
 miniBatchSize = 20;
@@ -210,17 +213,17 @@ options = trainingOptions('adam', ...
     'ValidationData',{X_val,Y_val}, ...
     'MiniBatchSize',miniBatchSize, ...
     'GradientThreshold',1, ...
-    'Verbose',false, ...
+    'Verbose',true, ...
     'Plots','training-progress');
 
 % Load or train NN
 file = fullfile(pwd, 'learning_dynamical_systems', 'deep_learning', 'models', 'net.mat');
-if isfile(file)
-    net = load(file, 'net').net;
-else
+% if isfile(file)
+%     net = load(file, 'net').net;
+% else
     net = trainNetwork(X_train, Y_train, layers, options);
     save(file, 'net');
-end
+% end
 
 % FIGURE OUT ACCURACY
 
