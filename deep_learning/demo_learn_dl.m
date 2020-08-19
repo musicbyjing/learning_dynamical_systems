@@ -1,4 +1,8 @@
-% This script builds off of the following:
+% Author: Jing Liu
+% Supervisor: Prof. Hsiu-Chin Lin, Summer 2020
+% Affiliation: McGill University
+% 
+% This is a modified version of the following:
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Demo Script for GMM-based LPV-DS Learning introduced in paper:          %
@@ -204,7 +208,7 @@ layers = [ ...
 % The built-in `regressionLayer` uses the half-MSE loss
 % The custom `log_barrier_regression_layer` uses a log barrier + MSE loss
 
-maxEpochs = 1000;
+maxEpochs = 500;
 miniBatchSize = 20;
 
 options = trainingOptions('adam', ...

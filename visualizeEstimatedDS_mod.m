@@ -1,3 +1,7 @@
+% Author: Jing Liu
+% Supervisor: Prof. Hsiu-Chin Lin, Summer 2020
+% Affiliation: McGill University
+
 function [hd, hs, hr, x_sim] = visualizeEstimatedDS_mod(method, A, Xi_ref, Y_pred, ds_plot_options)
 fig1 = figure('Color',[1 1 1]);
 M = size(Xi_ref,1);

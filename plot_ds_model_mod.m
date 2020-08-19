@@ -1,3 +1,7 @@
+% Author: Jing Liu
+% Supervisor: Prof. Hsiu-Chin Lin, Summer 2020
+% Affiliation: McGill University
+
 function [h,xd] = plot_ds_model_mod(method, A, Y_pred, fig, target, limits, varargin)
 
 quality='medium';

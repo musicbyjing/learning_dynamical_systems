@@ -34,9 +34,7 @@ names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
     'Spoon','Sshape','Trapezoid','Worm','WShape','Zshape',...
     'Multi_Models_1', 'Multi_Models_2', 'Multi_Models_3','Multi_Models_4'};
 
-%% Step 0 - OPTION 1: Gather user inputs
-
-n = -1; c = 0;
+c = 0;
 fprintf('\nAvailable Models:\n')
 for i=1:8
     for j=1:5
@@ -49,21 +47,24 @@ for i=1:8
     fprintf('\n')
 end
 
-% Prompt
-s1 = 'Enter the following as numbers separated by spaces: ';
-s2 = '1) Model number (int; see command window);';
-s3 = '2) 0 to use all data, 1 to select an area;';
-s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
-s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
-prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
-ans = inputdlg(prompt);
-user_input = str2num(ans{:})
+%% Step 0 - OPTION 1: Gather user inputs
 
-n = user_input(1);
-select_area = user_input(2);
-prop_to_delete = user_input(3);
-store_params = user_input(4);
-test_set_prop = 0.2;
+% % Prompt
+% s1 = 'Enter the following as numbers separated by spaces: ';
+% s2 = '1) Model number (int; see command window);';
+% s3 = '2) 0 to use all data, 1 to select an area;';
+% s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
+% s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
+% prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
+% ans = inputdlg(prompt);
+% user_input = str2num(ans{:})
+% 
+% model_number = user_input(1);
+% select_area = user_input(2);
+% prop_to_delete = user_input(3);
+% store_params = user_input(4);
+% 
+% test_set_prop = 0.2;
 
 %% Step 0 - OPTION 2: Hardcoded options (to run this file in a loop)
 % Comment out Step 0 OPTION 1 and run `loop_demo_learn_lpvDS` with the
@@ -123,7 +124,7 @@ test_set_prop = 0.2;
 % Select one of the motions from the LASA Handwriting Dataset
 sub_sample      = 5; % Each trajectory has 1000 samples when set to '1'
 nb_trajectories = 7; % Maximum 7, will select randomly if <7
-[Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS_mod(n, names, sub_sample, nb_trajectories);
+[Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS_mod(model_number, names, sub_sample, nb_trajectories);
 
 % Position/Velocity Trajectories
 vel_samples = 15; vel_size = 0.5; 
@@ -196,7 +197,9 @@ end
 % Separate a test set from the training data
 dataset_size = size(Xi_ref, 2);
 test_size = int16(test_set_prop * dataset_size);
-rng(1); % Set a seed so that the same test set is chosen each time
+% Set a seed so that the same test set is chosen each time. This is useful 
+% when experimenting with different dataset sizes for the same dataset
+% rng(1); 
 permutation = randperm(dataset_size);
 
 Xi_ref_test = Xi_ref(:, permutation(1:test_size)); % test set
@@ -273,10 +276,10 @@ end
 
 %%%%%%%%  LPV system sum_{k=1}^{K}\gamma_k(xi)(A_kxi + b_k) %%%%%%%%  
 if constr_type == 1
-    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Data_sh, zeros(M,1), constr_type, ds_gmm, P_opt, init_cvx);
+    [A_k, b_k, P_est] = optimize_lpv_ds_from_data(Data_sh, zeros(M,1), constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x-repmat(att,[1 size(x,2)]), ds_gmm, A_k, b_k);
 else
-    [A_k, b_k, P_est] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, att, constr_type, ds_gmm, P_opt, init_cvx);
+    [A_k, b_k, P_est, time] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, att, constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x, ds_gmm, A_k, b_k);
 end
 
@@ -348,7 +351,7 @@ end
 if ds_plot_options.sim_traj
     nb_traj       = size(x_sim,3);
     ref_traj_leng = size(Xi_ref_test,2)/nb_traj;
-    dtwd_test = zeros(1,nb_traj);
+    dtwd_test = zeros(1,nb_traj);c
     for n=1:nb_traj
         start_id = round(1+(n-1)*ref_traj_leng);
         end_id   = round(n*ref_traj_leng);
@@ -357,18 +360,18 @@ if ds_plot_options.sim_traj
     fprintf('LPV-DS got DTWD of reproduced trajectories: %2.4f +/- %2.4f \n', mean(dtwd_test),std(dtwd_test));
 end
 
-% Store variables in graph_data.mat if learning from previous data
+% Store errors and calculation times
 file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
 if isfile(file)
     load(file, 'graph_data');
-    temp = [dataset_size; rmse_test; edot_test; mean(dtwd_test); std(dtwd_test); ...
-        rmse; edot; mean(dtwd); std(dtwd)];
+    temp = [model_number; dataset_size; rmse_test; edot_test; mean(dtwd_test); std(dtwd_test); ...
+        rmse; edot; mean(dtwd); std(dtwd); time];
     graph_data = [graph_data temp];
     save(file, 'graph_data');
     fprintf('Dataset size and errors (RMSE, e_dot, DTWD) appended to graph_data.mat.\n')
 else
-    graph_data = [dataset_size; rmse_test; edot_test; mean(dtwd_test); std(dtwd_test); ...
-        rmse; edot; mean(dtwd); std(dtwd)];
+    graph_data = [model_number; dataset_size; rmse_test; edot_test; mean(dtwd_test); std(dtwd_test); ...
+        rmse; edot; mean(dtwd); std(dtwd); time];
     save(file, 'graph_data');
     fprintf('graph_data.mat created. Dataset size and errors (RMSE, e_dot, DTWD) saved.\n')
 end

@@ -1,4 +1,8 @@
-% This script builds off of the following:
+% Author: Jing Liu
+% Supervisor: Prof. Hsiu-Chin Lin, Summer 2020
+% Affiliation: McGill University
+% 
+% This is a modified version of the following:
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Demo Script for GMM-based LPV-DS Learning introduced in paper:          %

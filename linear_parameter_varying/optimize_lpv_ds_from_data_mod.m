@@ -1,4 +1,4 @@
-function [A_c, b_c, P] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, attractor, ctr_type, gmm, varargin)
+function [A_c, b_c, P, time] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, attractor, ctr_type, gmm, varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) 2018 Learning Algorithms and Systems Laboratory,          %
 % EPFL, Switzerland                                                       %
@@ -180,6 +180,8 @@ end
 sol.info
 check(Constraints)
 fprintf('Total error: %2.2f\nComputation Time: %2.2f\n', value(Objective),sol.solvertime);
+
+time = sol.solvertime;
 
 
 %% %% FOR DEBUGGING: Check Negative-Definite Constraint %%%%
