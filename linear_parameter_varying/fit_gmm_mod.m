@@ -1,4 +1,4 @@
-function [Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, store_params, est_options)
+function [Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, learn_from_prev, est_options)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) 2018 Learning Algorithms and Systems Laboratory,          %
 % EPFL, Switzerland                                                       %
@@ -219,9 +219,9 @@ switch est_type
         warning('off', 'all'); % there are a lot of really annoying warnings when fitting GMMs
         
         %fit a GMM to our data
-        if store_params == 0
+        if learn_from_prev == 0
             GMM_full = fitgmdist([Xi_ref]', k, 'Start', 'plus', 'CovarianceType','full', 'Regularize', .000001, 'Replicates', 10);
-        elseif store_params == 1
+        elseif learn_from_prev == 1
             load(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "Mu", "Sigma");
             fprintf("\n\nmu and Sigma loaded from saved_params.mat");
             S = struct('mu', transpose(Mu), 'Sigma', Sigma);
@@ -235,7 +235,7 @@ switch est_type
         Sigma = GMM_full.Sigma;
         
         % Save parameters if appropriate
-        if store_params == 0
+        if learn_from_prev == 0
             save(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "Mu", "Sigma");
             fprintf("\n\nmu and Sigma saved to saved_params.mat \n");
         end

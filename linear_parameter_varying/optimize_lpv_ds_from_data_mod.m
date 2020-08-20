@@ -1,4 +1,4 @@
-function [A_c, b_c, P, time] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, attractor, ctr_type, gmm, varargin)
+function [A_c, b_c, P, time] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, learn_from_prev, attractor, ctr_type, gmm, varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Copyright (C) 2018 Learning Algorithms and Systems Laboratory,          %
 % EPFL, Switzerland                                                       %
@@ -38,10 +38,10 @@ init_cvx = 0;
 
 % Define DS Variables
 K = length(gmm.Priors);
-if store_params == 0
+if learn_from_prev == 0
     A_c = zeros(M,M,K);
     b_c = zeros(M,K);
-elseif store_params == 1 
+elseif learn_from_prev == 1 
     load(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "A_c", "b_c");
     fprintf("\n\nA_c and b_c loaded from saved_params.mat \n");
 end
@@ -164,7 +164,7 @@ for k = 1:K
 end
 
 % Save to file A_c and b_c if appropriate
-if store_params == 0
+if learn_from_prev == 0
     save(fullfile(pwd, "/learning_dynamical_systems/data_files/saved_params.mat"), "A_c", "b_c", '-append');
     fprintf("\n\nA_c and b_c saved to saved_params.mat \n");
 end

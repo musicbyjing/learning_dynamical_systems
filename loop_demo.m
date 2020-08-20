@@ -10,10 +10,10 @@ delete(fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat
 
 % Parameters to be set
 script = "demo_learn_lpvDS_mod.m";
-model_number = 1;
+model_number = 5;
 select_area = 0;
 % prop_to_delete assigned below
-store_params = 0;
+learn_from_prev = 1;
 
 test_set_prop = 0.2;
 
