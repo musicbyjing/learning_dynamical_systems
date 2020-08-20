@@ -62,7 +62,7 @@ end
 % model_number = user_input(1);
 % select_area = user_input(2);
 % prop_to_delete = user_input(3);
-% store_params = user_input(4);
+% learn_from_prev = user_input(4);
 % 
 % test_set_prop = 0.2;
 
@@ -221,7 +221,7 @@ Data_sh = [Xi_ref Xi_dot_ref];
 % Data = Data_sh;
 
 % Fit from scratch or use previously saved parameters
-[Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, store_params, est_options);
+[Priors, Mu, Sigma] = fit_gmm_mod(Xi_ref, Xi_dot_ref, learn_from_prev, est_options);
 
 %% Generate GMM data structure for DS learning
 clear ds_gmm; 
@@ -279,7 +279,7 @@ if constr_type == 1
     [A_k, b_k, P_est] = optimize_lpv_ds_from_data(Data_sh, zeros(M,1), constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x-repmat(att,[1 size(x,2)]), ds_gmm, A_k, b_k);
 else
-    [A_k, b_k, P_est, time] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, store_params, att, constr_type, ds_gmm, P_opt, init_cvx);
+    [A_k, b_k, P_est, time] = optimize_lpv_ds_from_data_mod(Xi_ref, Xi_dot_ref, learn_from_prev, att, constr_type, ds_gmm, P_opt, init_cvx);
     ds_lpv = @(x) lpv_ds(x, ds_gmm, A_k, b_k);
 end
 
