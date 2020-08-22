@@ -71,7 +71,7 @@ s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
 % store_params = user_input(4);
 % test_set_prop = 0.2;
 
-n = 8;
+n = 7;
 select_area = 0;
 prop_to_delete = 0;
 store_params = 0;
@@ -220,13 +220,13 @@ options = trainingOptions('adam', ...
     'Verbose',true, ...
     'Plots','training-progress');
 
-% Load or train NN
-file = fullfile(pwd, 'learning_dynamical_systems', 'deep_learning', 'models', 'net.mat');
+% Load NN from file or train NN
+% file = fullfile(pwd, 'learning_dynamical_systems', 'deep_learning', 'models', 'net.mat');
 % if isfile(file)
 %     net = load(file, 'net').net;
 % else
     net = trainNetwork(X_train, Y_train, layers, options);
-    save(file, 'net');
+%     save(file, 'net');
 % end
 
 % FIGURE OUT ACCURACY
@@ -266,7 +266,7 @@ Y_pred = predict(net, X_test); % prediction on the test set
 fprintf('dl, got prediction RMSE on test set: %d \n', rmse);
 fprintf('dl, got prediction edot on test set: %d \n', edot);
 
-% Store variables in graph_data.mat if learning from previous data
+% Store variables in graph_data.mat
 file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
 if isfile(file)
     load(file, 'graph_data');

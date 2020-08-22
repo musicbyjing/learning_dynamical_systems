@@ -53,16 +53,16 @@ end
 % s1 = 'Enter the following as numbers separated by spaces: ';
 % s2 = '1) Model number (int; see command window);';
 % s3 = '2) 0 to use all data, 1 to select an area;';
-% s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
-% s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
+% s4 = '3) 0 to store parameters, 1 to learn using stored parameters;';
+% s5 = '4) the proportion of the data to be randomly deleted (0-1, float);';
 % prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
 % ans = inputdlg(prompt);
 % user_input = str2num(ans{:})
 % 
 % model_number = user_input(1);
 % select_area = user_input(2);
-% prop_to_delete = user_input(3);
-% learn_from_prev = user_input(4);
+% learn_from_prev = user_input(3);
+% prop_to_delete = user_input(4);
 % 
 % test_set_prop = 0.2;
 
@@ -147,7 +147,7 @@ est_options.type             = 1;   % GMM Estimation Alorithm Type
 
 % If algo 1 selected:
 est_options.maxK             = 10;  % Maximum Gaussians for Type 1
-est_options.fixed_K          = [];  % Fix K and estimate with EM for Type 1; ORIGINALLY []
+est_options.fixed_K          = number_of_gaussians;  % Fix K and estimate with EM for Type 1; ORIGINALLY []
 
 % If algo 0 or 2 selected:
 est_options.samplerIter      = 50;  % Maximum Sampler Iterations
@@ -365,13 +365,13 @@ file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat
 if isfile(file)
     load(file, 'graph_data');
     temp = [model_number; dataset_size; rmse_test; edot_test; mean(dtwd_test); std(dtwd_test); ...
-        rmse; edot; mean(dtwd); std(dtwd); time];
+        rmse; edot; mean(dtwd); std(dtwd); time; length(ds_gmm.Priors)];
     graph_data = [graph_data temp];
     save(file, 'graph_data');
     fprintf('Dataset size and errors (RMSE, e_dot, DTWD) appended to graph_data.mat.\n')
 else
     graph_data = [model_number; dataset_size; rmse_test; edot_test; mean(dtwd_test); std(dtwd_test); ...
-        rmse; edot; mean(dtwd); std(dtwd); time];
+        rmse; edot; mean(dtwd); std(dtwd); time; length(ds_gmm.Priors)];
     save(file, 'graph_data');
     fprintf('graph_data.mat created. Dataset size and errors (RMSE, e_dot, DTWD) saved.\n')
 end
