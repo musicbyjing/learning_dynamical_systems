@@ -101,7 +101,7 @@ classdef log_barrier_regression_layer < nnet.layer.RegressionLayer
             part1 = 2*(Y-T); % size 2 x 1 x 229
             part2 = 2*(X-target) / sum(sum((-2*y_n'*(X-target)+1)));
             
-            % Create the middle dimension
+            % Create the middle dimension--dLdY needs to have the same size as Y
             bob = ones(2,1,num_points);
             bob(:,1,:) = part2;
             part2 = bob;

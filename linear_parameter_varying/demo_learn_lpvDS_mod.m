@@ -199,7 +199,7 @@ dataset_size = size(Xi_ref, 2);
 test_size = int16(test_set_prop * dataset_size);
 % Set a seed so that the same test set is chosen each time. This is useful 
 % when experimenting with different dataset sizes for the same dataset
-% rng(1); 
+rng(1);
 permutation = randperm(dataset_size);
 
 Xi_ref_test = Xi_ref(:, permutation(1:test_size)); % test set
