@@ -31,7 +31,7 @@
 % Public License for more details                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-close all; clc; clear all;
+close all; clc;
 
 names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
     'heee','JShape','JShape_2','Khamesh','Leaf_1',...
@@ -40,9 +40,7 @@ names = {'Angle','BendedLine','CShape','DoubleBendedLine','GShape',...
     'Spoon','Sshape','Trapezoid','Worm','WShape','Zshape',...
     'Multi_Models_1', 'Multi_Models_2', 'Multi_Models_3','Multi_Models_4'};
 
-%% Step 0 - OPTION 1: Gather user inputs
-
-n = -1; c = 0;
+c = 0;
 fprintf('\nAvailable Models:\n')
 for i=1:8
     for j=1:5
@@ -55,27 +53,23 @@ for i=1:8
     fprintf('\n')
 end
 
+%% Step 0 - OPTION 1: Gather user inputs
+% 
 % Prompt
-s1 = 'Enter the following as numbers separated by spaces: ';
-s2 = '1) Model number (int; see command window);';
-s3 = '2) 0 to use all data, 1 to select an area;';
-s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
-s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
-
+% s1 = 'Enter the following as numbers separated by spaces: ';
+% s2 = '1) Model number (int; see command window);';
+% s3 = '2) 0 to use all data, 1 to select an area;';
+% s4 = '3) the proportion of the data to be randomly deleted (0-1, float);';
+% s5 = '4) 0 to store parameters, 1 to learn using stored parameters;';
+% 
 % prompt = [s1 newline newline s2 newline newline s3 newline newline s4 newline newline s5];
 % ans = inputdlg(prompt);
 % user_input = str2num(ans{:})
-% n = user_input(1);
+% model_number = user_input(1);
 % select_area = user_input(2);
 % prop_to_delete = user_input(3);
 % store_params = user_input(4);
 % test_set_prop = 0.2;
-
-n = 7;
-select_area = 1;
-prop_to_delete = 0;
-store_params = 0;
-test_set_prop = 0.2;
 
 %% Step 0 - OPTION 2: Hardcoded options (to run this file in a loop)
 % Comment out Step 0 OPTION 1 and run `loop_demo` with the
@@ -99,7 +93,7 @@ test_set_prop = 0.2;
 % Select one of the motions from the LASA Handwriting Dataset
 sub_sample      = 5; % Each trajectory has 1000 samples when set to '1'
 nb_trajectories = 7; % Maximum 7, will select randomly if <7
-[Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS_mod(n, names, sub_sample, nb_trajectories);
+[Data, Data_sh, att, x0_all, ~, dt] = load_LASA_dataset_DS_mod(model_number, names, sub_sample, nb_trajectories);
 
 % Position/Velocity Trajectories
 vel_samples = 15; vel_size = 0.5; 
@@ -203,7 +197,7 @@ layers = [ ...
     flattenLayer
     lstmLayer(numHiddenUnits,'OutputMode','sequence')
     fullyConnectedLayer(numResponses)
-    log_barrier_regression_layer(X_train, [0;0])];
+    log_barrier_regression_layer(X_train, X_val, [0;0])];
 
 % The built-in `regressionLayer` uses the half-MSE loss
 % The custom `log_barrier_regression_layer` uses a log barrier + MSE loss
