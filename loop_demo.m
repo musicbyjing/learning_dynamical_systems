@@ -9,8 +9,8 @@
 delete(fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat'));
 
 % Parameters to be set
-script = "demo_learn_lpvDS_mod.m";
-model_number = 8;
+script = "demo_learn_dl.m";
+model_number = 7;
 select_area = 0;
 learn_from_prev = 0;
 % prop_to_delete assigned below
@@ -18,7 +18,7 @@ number_of_gaussians = []; % k
 
 test_set_prop = 0.2;
 
-num_runs = 20;
+num_runs = 1;
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % To run with varying dataset sizes %

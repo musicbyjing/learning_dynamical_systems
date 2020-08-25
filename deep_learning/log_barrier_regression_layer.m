@@ -7,13 +7,19 @@
 classdef log_barrier_regression_layer < nnet.layer.RegressionLayer
         
     properties
-        X
+        X_train
+        train_size
+        X_val
+        val_size
         target
     end
     
     methods
-        function layer = log_barrier_regression_layer(X, target)
-            layer.X = X;
+        function layer = log_barrier_regression_layer(X_train, X_val, target)
+            layer.X_train = X_train;
+            layer.train_size = size(X_train, 2);
+            layer.X_val = X_val;
+            layer.val_size = size(X_val, 2);
             layer.target = target; % the target point of the trajectory
         end
 
@@ -29,9 +35,15 @@ classdef log_barrier_regression_layer < nnet.layer.RegressionLayer
             % Output:
             %         loss  - Loss between Y and T
             
-            X = layer.X;
-            target = layer.target;
-
+            num_points = size(Y,3);
+            if num_points == layer.train_size
+                X = layer.X_train;
+            elseif num_points == layer.val_size
+                X = layer.X_val;
+            else
+                return;
+            end
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % When testing with the command window, initialize:
 %           X = rand(2, 229);
@@ -56,8 +68,6 @@ classdef log_barrier_regression_layer < nnet.layer.RegressionLayer
             part1 = sum(abs(Y-T).^2, 3); % size 2 x 1
             part1 = sum(part1, 1); % size 1 x 1
 
-            num_points = size(Y,3); % 229
-
             for n = 1:num_points 
                 y_n(1,n) = Y(1,1,n); % y_n has size 2 x 229
                 y_n(2,n) = Y(2,1,n);
@@ -67,7 +77,7 @@ classdef log_barrier_regression_layer < nnet.layer.RegressionLayer
                 % x_n(n) = X(:,n);
             end
 
-            part2 = sum(sum(-2 * y_n' * (X-target) + 1)); 
+            part2 = sum(sum(-2 * y_n' * (X-layer.target) + 1)); 
             % Original: 
             % part2 = sum (( -2.* y_n' * ( x-target))) 
             part2 = real(log(part2));
@@ -89,9 +99,14 @@ classdef log_barrier_regression_layer < nnet.layer.RegressionLayer
             %         dLdY  - Derivative of the loss with respect to the 
             %                 predictions Y        
             
-            X = layer.X;
-            target = layer.target;
             num_points = size(Y,3);
+            if num_points == layer.train_size
+                X = layer.X_train;
+            elseif num_points == layer.val_size
+                X = layer.X_val;
+            else
+                return;
+            end
             
             for n = 1:num_points 
                 y_n(1,n) = Y(1,1,n);
@@ -99,7 +114,7 @@ classdef log_barrier_regression_layer < nnet.layer.RegressionLayer
             end
             
             part1 = 2*(Y-T); % size 2 x 1 x 229
-            part2 = 2*(X-target) / sum(sum((-2*y_n'*(X-target)+1)));
+            part2 = 2*(X-layer.target) / sum(sum((-2*y_n'*(X-layer.target)+1)));
             
             % Create the middle dimension--dLdY needs to have the same size as Y
             bob = ones(2,1,num_points);
