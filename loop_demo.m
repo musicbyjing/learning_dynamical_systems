@@ -1,4 +1,4 @@
-% Author: Jing Liu
+% Author: Jing Liu 
 % Supervisor: Prof. Hsiu-Chin Lin, Summer 2020
 % Affiliation: McGill University
 
@@ -10,7 +10,7 @@ delete(fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat
 
 % Parameters to be set
 script = "demo_learn_dl.m";
-model_number = 7;
+model_number = 8;
 select_area = 0;
 learn_from_prev = 0;
 % prop_to_delete assigned below

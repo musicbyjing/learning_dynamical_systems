@@ -6,7 +6,7 @@
 
 function [] = get_mvr_results()
 
-file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data.mat');
+file = fullfile(pwd, 'learning_dynamical_systems', 'data_files', 'graph_data8_dl2.mat');
 load(file, 'graph_data');
 
 %%% Make sure these are the correct rows in graph_data (may vary depending

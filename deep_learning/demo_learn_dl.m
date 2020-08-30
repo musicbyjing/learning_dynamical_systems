@@ -188,6 +188,9 @@ Y_train(:,idx) = [];
 %% %%%%%%%%  Step 3 (DS ESTIMATION): ESTIMATE SYSTEM DYNAMICS MATRICES  %%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Based on:
+% https://www.mathworks.com/help/deeplearning/ug/sequence-to-sequence-regression-using-deep-learning.html
+
 numFeatures = 2;
 numHiddenUnits = 125;
 numResponses = 2;
@@ -246,7 +249,7 @@ ds_plot_options.plot_vol  = 1;            % Plot volume of initial points (3D)
 
 [hd, hs, hr, x_sim] = visualizeEstimatedDS_mod('dl', [], Xi_ref, Y_pred, ds_plot_options);
 limits = axis;
-title('Series Neural Network')
+title(sprintf('Series Neural Network, LASA %d', model_number));
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%   Step 4 (Evaluation): Compute Metrics and Visualize Velocities %%
