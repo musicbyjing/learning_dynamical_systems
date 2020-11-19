@@ -1,5 +1,7 @@
 # learning_dynamical_systems
 
+[**Report**](https://github.com/musicbyjing/learning_dynamical_systems/blob/master/Dynamical_Systems_report.pdf)
+
 This repo builds on [`ds-opt`](https://github.com/nbfigueroa/ds-opt) to explore (1) transfer learning between similar datasets, and (2) different regression methods.
 
 To get started, clone [`ds-opt`](https://github.com/nbfigueroa/ds-opt) and its necessary dependencies. Then clone this repo, place it inside `ds-opt`, and add it to the MATLAB path.
